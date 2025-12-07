@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useUser } from '@clerk/clerk-react';
-import { Plus, Edit2, Trash2, Image, Download } from 'lucide-react';
+import { Plus, Edit2, Trash2, Image, Download, Users } from 'lucide-react';
 import ChildProfileModal from './ChildProfileModal';
 import ImportProfilesModal from './ImportProfilesModal';
 
@@ -39,7 +39,6 @@ export default function UserProfileSection({ children, onAddChild, onEditChild, 
         if (onImportChildren) {
             onImportChildren(profiles);
         } else {
-            // Fallback: add each profile individually
             profiles.forEach(profile => onAddChild(profile));
         }
     };
@@ -54,44 +53,59 @@ export default function UserProfileSection({ children, onAddChild, onEditChild, 
 
     return (
         <section style={{
-            backgroundColor: 'white',
-            borderRadius: '1.5rem',
-            padding: '2rem',
-            boxShadow: 'var(--shadow-md)',
-            marginBottom: '2rem'
+            backgroundColor: 'var(--surface)',
+            borderRadius: 'var(--radius-2xl)',
+            padding: 'var(--space-6)',
+            border: '1px solid var(--border-light)',
+            boxShadow: 'var(--shadow-sm)',
+            marginBottom: 'var(--space-6)'
         }}>
             {/* Header */}
             <div style={{
                 display: 'flex',
                 justifyContent: 'space-between',
                 alignItems: 'flex-start',
-                marginBottom: '1.5rem',
+                marginBottom: 'var(--space-5)',
                 flexWrap: 'wrap',
-                gap: '1rem'
+                gap: 'var(--space-4)'
             }}>
                 <div>
-                    <h2 style={{ fontSize: '1.5rem', fontWeight: '700', marginBottom: '0.25rem' }}>
-                        👨‍👩‍👧 Your Young Artists
-                    </h2>
-                    <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>
+                    <div style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 'var(--space-2)',
+                        marginBottom: 'var(--space-1)'
+                    }}>
+                        <Users size={20} color="var(--primary)" />
+                        <h2 style={{
+                            fontSize: '1.125rem',
+                            fontWeight: '600',
+                            fontFamily: 'var(--font-display)',
+                            color: 'var(--text-main)'
+                        }}>
+                            Your Young Artists
+                        </h2>
+                    </div>
+                    <p style={{
+                        color: 'var(--text-muted)',
+                        fontSize: '0.875rem'
+                    }}>
                         Manage profiles for your children's artwork
                     </p>
                 </div>
-                <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+                <div style={{ display: 'flex', gap: 'var(--space-2)', flexWrap: 'wrap' }}>
                     <button
                         onClick={() => setIsImportModalOpen(true)}
-                        className="btn btn-outline"
-                        style={{ gap: '0.5rem' }}
+                        className="btn btn-outline btn-sm"
                     >
-                        <Download size={18} />
+                        <Download size={16} />
                         Import from Kindora
                     </button>
                     <button
                         onClick={handleAddClick}
-                        className="btn btn-primary"
-                        style={{ gap: '0.5rem' }}
+                        className="btn btn-primary btn-sm"
                     >
-                        <Plus size={18} />
+                        <Plus size={16} />
                         Add Child
                     </button>
                 </div>
@@ -102,17 +116,19 @@ export default function UserProfileSection({ children, onAddChild, onEditChild, 
                 <div style={{
                     display: 'grid',
                     gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-                    gap: '1rem'
+                    gap: 'var(--space-4)'
                 }}>
                     {children.map((child) => (
                         <div
                             key={child.id}
                             style={{
-                                backgroundColor: 'var(--surface)',
-                                borderRadius: '1rem',
-                                padding: '1.25rem',
-                                border: child.importedFrom ? '2px solid #6366F1' : '1px solid var(--border)',
-                                transition: 'all 0.2s ease',
+                                backgroundColor: 'var(--background)',
+                                borderRadius: 'var(--radius-xl)',
+                                padding: 'var(--space-5)',
+                                border: child.importedFrom
+                                    ? '1.5px solid var(--primary)'
+                                    : '1px solid var(--border-light)',
+                                transition: 'all var(--transition-fast)',
                                 position: 'relative'
                             }}
                         >
@@ -120,30 +136,34 @@ export default function UserProfileSection({ children, onAddChild, onEditChild, 
                             {child.importedFrom && (
                                 <div style={{
                                     position: 'absolute',
-                                    top: '-0.5rem',
-                                    right: '1rem',
-                                    backgroundColor: '#6366F1',
+                                    top: '-8px',
+                                    right: 'var(--space-4)',
+                                    backgroundColor: 'var(--primary)',
                                     color: 'white',
-                                    padding: '0.2rem 0.6rem',
-                                    borderRadius: '999px',
-                                    fontSize: '0.7rem',
+                                    padding: 'var(--space-1) var(--space-3)',
+                                    borderRadius: 'var(--radius-full)',
+                                    fontSize: '0.6875rem',
                                     fontWeight: '600'
                                 }}>
                                     From Kindora
                                 </div>
                             )}
 
-                            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem' }}>
+                            <div style={{
+                                display: 'flex',
+                                alignItems: 'flex-start',
+                                gap: 'var(--space-4)'
+                            }}>
                                 {/* Avatar */}
                                 <div style={{
-                                    width: '56px',
-                                    height: '56px',
-                                    borderRadius: '50%',
-                                    background: 'linear-gradient(135deg, var(--primary), var(--accent))',
+                                    width: '48px',
+                                    height: '48px',
+                                    borderRadius: 'var(--radius-full)',
+                                    background: 'linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%)',
                                     display: 'flex',
                                     alignItems: 'center',
                                     justifyContent: 'center',
-                                    fontSize: '1.75rem',
+                                    fontSize: '1.5rem',
                                     flexShrink: 0
                                 }}>
                                     {child.avatarEmoji || '🎨'}
@@ -152,45 +172,32 @@ export default function UserProfileSection({ children, onAddChild, onEditChild, 
                                 {/* Info */}
                                 <div style={{ flex: 1, minWidth: 0 }}>
                                     <h3 style={{
-                                        fontSize: '1.1rem',
-                                        fontWeight: '700',
-                                        marginBottom: '0.25rem'
+                                        fontSize: '1rem',
+                                        fontWeight: '600',
+                                        marginBottom: 'var(--space-2)',
+                                        color: 'var(--text-main)'
                                     }}>
                                         {child.name}
                                     </h3>
                                     <div style={{
                                         display: 'flex',
-                                        gap: '0.5rem',
+                                        gap: 'var(--space-2)',
                                         alignItems: 'center',
-                                        marginBottom: '0.5rem',
+                                        marginBottom: 'var(--space-2)',
                                         flexWrap: 'wrap'
                                     }}>
-                                        <span style={{
-                                            backgroundColor: 'var(--primary)',
-                                            color: 'white',
-                                            padding: '0.2rem 0.6rem',
-                                            borderRadius: '999px',
-                                            fontSize: '0.75rem',
-                                            fontWeight: '600'
-                                        }}>
+                                        <span className="badge badge-primary">
                                             Age {child.age}
                                         </span>
-                                        <span style={{
-                                            backgroundColor: 'var(--secondary)',
-                                            color: '#78350F',
-                                            padding: '0.2rem 0.6rem',
-                                            borderRadius: '999px',
-                                            fontSize: '0.75rem',
-                                            fontWeight: '600'
-                                        }}>
+                                        <span className="badge badge-success">
                                             {getAgeGroup(child.age)}
                                         </span>
                                     </div>
                                     {child.description && (
                                         <p style={{
                                             color: 'var(--text-muted)',
-                                            fontSize: '0.85rem',
-                                            lineHeight: 1.4
+                                            fontSize: '0.8125rem',
+                                            lineHeight: 1.5
                                         }}>
                                             {child.description}
                                         </p>
@@ -203,46 +210,42 @@ export default function UserProfileSection({ children, onAddChild, onEditChild, 
                                 display: 'flex',
                                 justifyContent: 'space-between',
                                 alignItems: 'center',
-                                marginTop: '1rem',
-                                paddingTop: '1rem',
-                                borderTop: '1px solid var(--border)'
+                                marginTop: 'var(--space-4)',
+                                paddingTop: 'var(--space-4)',
+                                borderTop: '1px solid var(--border-light)'
                             }}>
-                                <div style={{ display: 'flex', gap: '1rem' }}>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', color: 'var(--text-muted)', fontSize: '0.85rem' }}>
-                                        <Image size={16} />
-                                        <span>{child.artworkCount || 0} artworks</span>
-                                    </div>
+                                <div style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: 'var(--space-2)',
+                                    color: 'var(--text-muted)',
+                                    fontSize: '0.8125rem'
+                                }}>
+                                    <Image size={14} />
+                                    <span>{child.artworkCount || 0} artworks</span>
                                 </div>
-                                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                <div style={{ display: 'flex', gap: 'var(--space-1)' }}>
                                     <button
                                         onClick={() => handleEditClick(child)}
-                                        style={{
-                                            background: 'none',
-                                            border: 'none',
-                                            cursor: 'pointer',
-                                            padding: '0.5rem',
-                                            borderRadius: '0.5rem',
-                                            color: 'var(--text-muted)',
-                                            transition: 'all 0.2s'
-                                        }}
+                                        className="btn btn-ghost btn-icon"
+                                        style={{ width: '32px', height: '32px' }}
                                         title="Edit profile"
+                                        aria-label="Edit profile"
                                     >
-                                        <Edit2 size={18} />
+                                        <Edit2 size={16} />
                                     </button>
                                     <button
                                         onClick={() => onDeleteChild(child.id)}
+                                        className="btn btn-ghost btn-icon"
                                         style={{
-                                            background: 'none',
-                                            border: 'none',
-                                            cursor: 'pointer',
-                                            padding: '0.5rem',
-                                            borderRadius: '0.5rem',
-                                            color: 'var(--rose)',
-                                            transition: 'all 0.2s'
+                                            width: '32px',
+                                            height: '32px',
+                                            color: 'var(--rose)'
                                         }}
                                         title="Delete profile"
+                                        aria-label="Delete profile"
                                     >
-                                        <Trash2 size={18} />
+                                        <Trash2 size={16} />
                                     </button>
                                 </div>
                             </div>
@@ -253,30 +256,58 @@ export default function UserProfileSection({ children, onAddChild, onEditChild, 
                 /* Empty State */
                 <div style={{
                     textAlign: 'center',
-                    padding: '3rem 2rem',
+                    padding: 'var(--space-12) var(--space-8)',
                     backgroundColor: 'var(--surface-alt)',
-                    borderRadius: '1rem'
+                    borderRadius: 'var(--radius-xl)'
                 }}>
-                    <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>🎨</div>
-                    <h3 style={{ fontSize: '1.25rem', fontWeight: '700', marginBottom: '0.5rem' }}>
+                    <div style={{
+                        width: '64px',
+                        height: '64px',
+                        borderRadius: 'var(--radius-full)',
+                        backgroundColor: 'var(--primary-bg)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        margin: '0 auto var(--space-4)',
+                        fontSize: '1.75rem'
+                    }}>
+                        🎨
+                    </div>
+                    <h3 style={{
+                        fontSize: '1.125rem',
+                        fontWeight: '600',
+                        marginBottom: 'var(--space-2)',
+                        color: 'var(--text-main)'
+                    }}>
                         No artist profiles yet
                     </h3>
-                    <p style={{ color: 'var(--text-muted)', marginBottom: '1.5rem', maxWidth: '400px', margin: '0 auto 1.5rem' }}>
-                        Add your child's profile to start showcasing their artwork, or import existing profiles from Kindora.ai!
+                    <p style={{
+                        color: 'var(--text-muted)',
+                        marginBottom: 'var(--space-6)',
+                        maxWidth: '360px',
+                        margin: '0 auto var(--space-6)',
+                        fontSize: '0.9375rem'
+                    }}>
+                        Add your child's profile to start showcasing their artwork
                     </p>
-                    <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'center', flexWrap: 'wrap' }}>
+                    <div style={{
+                        display: 'flex',
+                        gap: 'var(--space-3)',
+                        justifyContent: 'center',
+                        flexWrap: 'wrap'
+                    }}>
                         <button
                             onClick={() => setIsImportModalOpen(true)}
                             className="btn btn-outline"
                         >
-                            <Download size={18} />
+                            <Download size={16} />
                             Import from Kindora
                         </button>
                         <button
                             onClick={handleAddClick}
                             className="btn btn-primary"
                         >
-                            <Plus size={18} />
+                            <Plus size={16} />
                             Add Your First Artist
                         </button>
                     </div>

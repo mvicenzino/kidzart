@@ -6,7 +6,7 @@ import ArtModal from './components/ArtModal';
 import FilterBar from './components/FilterBar';
 import ProfilePage from './pages/ProfilePage';
 import { artworks, taxonomy } from './data/mockData';
-import { Sparkles, Rocket, Gift, Palette } from 'lucide-react';
+import { Sparkles, ArrowRight, Palette, Users, Heart } from 'lucide-react';
 
 // Home Page Component
 function HomePage() {
@@ -46,164 +46,220 @@ function HomePage() {
     });
   }, [filters]);
 
+  const highlightedArtworks = artworks.filter(art => art.highlight);
   const hasActiveFilters = Object.values(filters).some(v => v !== 'all');
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       <Navbar />
 
-      {/* Hero Section */}
+      {/* Hero Section - Clean and Focused */}
       <header style={{
-        padding: '6rem 0',
-        background: 'linear-gradient(to bottom, #FDFBF7, #FEF3C7)',
+        padding: 'var(--space-20) 0 var(--space-16)',
+        background: 'linear-gradient(180deg, #F8FAFF 0%, var(--background) 100%)',
         position: 'relative',
         overflow: 'hidden'
       }}>
-        {/* Decorative Circles */}
+        {/* Subtle Background Decoration */}
         <div style={{
           position: 'absolute',
-          top: '-10%',
-          right: '-5%',
+          top: '-150px',
+          right: '-100px',
+          width: '400px',
+          height: '400px',
+          borderRadius: '50%',
+          background: 'radial-gradient(circle, rgba(99, 102, 241, 0.08) 0%, transparent 70%)',
+          pointerEvents: 'none'
+        }} />
+        <div style={{
+          position: 'absolute',
+          bottom: '-100px',
+          left: '-50px',
           width: '300px',
           height: '300px',
           borderRadius: '50%',
-          background: 'rgba(139, 92, 246, 0.1)',
-          filter: 'blur(40px)'
-        }} />
-        <div style={{
-          position: 'absolute',
-          bottom: '10%',
-          left: '-5%',
-          width: '200px',
-          height: '200px',
-          borderRadius: '50%',
-          background: 'rgba(56, 189, 248, 0.1)',
-          filter: 'blur(40px)'
+          background: 'radial-gradient(circle, rgba(236, 72, 153, 0.06) 0%, transparent 70%)',
+          pointerEvents: 'none'
         }} />
 
         <div className="container" style={{ position: 'relative', textAlign: 'center' }}>
+          {/* Tagline Badge */}
           <div style={{
             display: 'inline-flex',
             alignItems: 'center',
-            gap: '0.5rem',
-            backgroundColor: 'white',
-            padding: '0.5rem 1rem',
-            borderRadius: '999px',
-            marginBottom: '1.5rem',
-            boxShadow: 'var(--shadow-sm)',
-            border: '1px solid var(--surface-alt)'
+            gap: 'var(--space-2)',
+            backgroundColor: 'var(--primary-bg)',
+            padding: 'var(--space-2) var(--space-4)',
+            borderRadius: 'var(--radius-full)',
+            marginBottom: 'var(--space-6)'
           }}>
-            <Sparkles size={16} color="var(--secondary)" />
-            <span style={{ fontSize: '0.875rem', fontWeight: '600', color: 'var(--text-muted)' }}>The world's happiest art gallery</span>
-          </div>
-
-          <h1 style={{
-            fontSize: '4rem',
-            fontWeight: '800',
-            marginBottom: '1.5rem',
-            lineHeight: 1.1,
-            letterSpacing: '-0.03em'
-          }}>
-            Where Little Imaginations<br />
-            <span className="text-gradient">Run Wild & Free</span>
-          </h1>
-
-          <p style={{
-            fontSize: '1.25rem',
-            color: 'var(--text-muted)',
-            maxWidth: '600px',
-            margin: '0 auto 2rem',
-            lineHeight: 1.6
-          }}>
-            Kidzart is the safe, fun place for parents to showcase their children's creativity.
-            Upload drawings, paintings, and crafts to share with family and friends!
-          </p>
-
-          {/* Donation Message */}
-          <div style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '0.75rem',
-            backgroundColor: '#FEF3C7',
-            padding: '0.75rem 1.5rem',
-            borderRadius: '999px',
-            marginBottom: '2rem',
-            border: '2px solid #FCD34D'
-          }}>
-            <Gift size={20} color="#D97706" />
-            <span style={{ fontSize: '0.95rem', fontWeight: '600', color: '#92400E' }}>
-              💛 All donations go directly to families to support education & creativity
+            <Sparkles size={14} color="var(--primary)" />
+            <span style={{
+              fontSize: '0.8125rem',
+              fontWeight: '600',
+              color: 'var(--primary)'
+            }}>
+              Celebrating Young Creativity
             </span>
           </div>
 
-          <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
-            <a
-              href="#gallery"
-              className="btn btn-primary"
-              style={{ padding: '1rem 2rem', fontSize: '1.125rem', textDecoration: 'none' }}
-            >
-              <Palette size={20} />
-              Browse Gallery
-            </a>
-            <button className="btn btn-secondary" style={{ padding: '1rem 2rem', fontSize: '1.125rem' }}>
-              <Rocket size={20} />
-              Add Your Art
-            </button>
-          </div>
+          {/* Main Headline */}
+          <h1 style={{
+            fontSize: 'clamp(2.5rem, 5vw, 3.5rem)',
+            fontWeight: '800',
+            fontFamily: 'var(--font-display)',
+            marginBottom: 'var(--space-4)',
+            lineHeight: 1.15,
+            letterSpacing: '-0.03em',
+            color: 'var(--text-main)'
+          }}>
+            Where Little Artists<br />
+            <span className="text-gradient">Shine Bright</span>
+          </h1>
 
-          {/* Gallery Stats */}
+          {/* Subtitle */}
+          <p style={{
+            fontSize: '1.125rem',
+            color: 'var(--text-muted)',
+            maxWidth: '540px',
+            margin: '0 auto var(--space-8)',
+            lineHeight: 1.7
+          }}>
+            A safe gallery for parents to showcase their children's artwork
+            and connect with a community that appreciates young creativity.
+          </p>
+
+          {/* CTA Buttons */}
           <div style={{
             display: 'flex',
-            gap: '3rem',
+            gap: 'var(--space-3)',
             justifyContent: 'center',
-            marginTop: '3rem',
             flexWrap: 'wrap'
           }}>
-            <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: '2.5rem', fontWeight: '800', color: 'var(--primary)' }}>50+</div>
-              <div style={{ fontSize: '0.9rem', color: 'var(--text-muted)', fontWeight: '500' }}>Artworks</div>
-            </div>
-            <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: '2.5rem', fontWeight: '800', color: 'var(--primary)' }}>25+</div>
-              <div style={{ fontSize: '0.9rem', color: 'var(--text-muted)', fontWeight: '500' }}>Young Artists</div>
-            </div>
-            <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: '2.5rem', fontWeight: '800', color: 'var(--primary)' }}>$1.2k</div>
-              <div style={{ fontSize: '0.9rem', color: 'var(--text-muted)', fontWeight: '500' }}>Donated</div>
-            </div>
+            <a
+              href="#gallery"
+              className="btn btn-primary btn-lg"
+            >
+              <Palette size={18} />
+              Browse Gallery
+            </a>
+            <a
+              href="#highlights"
+              className="btn btn-outline btn-lg"
+            >
+              Featured Artists
+              <ArrowRight size={18} />
+            </a>
+          </div>
+
+          {/* Stats Row */}
+          <div style={{
+            display: 'flex',
+            gap: 'var(--space-10)',
+            justifyContent: 'center',
+            marginTop: 'var(--space-12)',
+            flexWrap: 'wrap'
+          }}>
+            {[
+              { icon: Palette, value: '50+', label: 'Artworks' },
+              { icon: Users, value: '25+', label: 'Young Artists' },
+              { icon: Heart, value: '1.2k', label: 'Likes' }
+            ].map((stat, idx) => (
+              <div key={idx} style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 'var(--space-3)'
+              }}>
+                <div style={{
+                  width: '44px',
+                  height: '44px',
+                  borderRadius: 'var(--radius-lg)',
+                  backgroundColor: 'var(--surface)',
+                  border: '1px solid var(--border-light)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}>
+                  <stat.icon size={20} color="var(--primary)" />
+                </div>
+                <div style={{ textAlign: 'left' }}>
+                  <div style={{
+                    fontSize: '1.375rem',
+                    fontWeight: '700',
+                    color: 'var(--text-main)',
+                    lineHeight: 1.2
+                  }}>
+                    {stat.value}
+                  </div>
+                  <div style={{
+                    fontSize: '0.8125rem',
+                    color: 'var(--text-muted)',
+                    fontWeight: '500'
+                  }}>
+                    {stat.label}
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </header>
 
-      {/* Highlights Section - Sebastian's Art */}
-      <section style={{
-        background: 'linear-gradient(135deg, #EDE9FE 0%, #FCE7F3 50%, #FEF3C7 100%)',
-        padding: '4rem 0'
+      {/* Highlights Section */}
+      <section id="highlights" style={{
+        background: 'linear-gradient(135deg, #F5F3FF 0%, #FCE7F3 50%, #FEF3C7 100%)',
+        padding: 'var(--space-16) 0'
       }}>
         <div className="container">
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '2rem' }}>
-            <div style={{
-              background: 'linear-gradient(135deg, var(--primary), var(--rose))',
-              padding: '0.5rem 1rem',
-              borderRadius: '999px',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.5rem'
-            }}>
-              <Sparkles size={18} color="white" />
-              <span style={{ color: 'white', fontWeight: '700', fontSize: '0.875rem' }}>HIGHLIGHTS</span>
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            marginBottom: 'var(--space-8)',
+            flexWrap: 'wrap',
+            gap: 'var(--space-4)'
+          }}>
+            <div>
+              <div style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 'var(--space-2)',
+                backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                padding: 'var(--space-1) var(--space-3)',
+                borderRadius: 'var(--radius-full)',
+                marginBottom: 'var(--space-3)'
+              }}>
+                <Sparkles size={14} color="var(--primary)" />
+                <span style={{
+                  fontSize: '0.75rem',
+                  fontWeight: '700',
+                  color: 'var(--primary)',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.05em'
+                }}>
+                  Featured
+                </span>
+              </div>
+              <h2 style={{
+                fontSize: '1.75rem',
+                fontWeight: '700',
+                fontFamily: 'var(--font-display)',
+                color: 'var(--text-main)',
+                marginBottom: 'var(--space-1)'
+              }}>
+                Sebastian's Gallery
+              </h2>
+              <p style={{
+                color: 'var(--text-muted)',
+                fontSize: '0.9375rem'
+              }}>
+                Featured artwork from our rising star, age 4
+              </p>
             </div>
           </div>
 
-          <h2 style={{ fontSize: '2.5rem', fontWeight: '800', marginBottom: '0.5rem', color: 'var(--text-main)' }}>
-            ✨ Sebastian's Gallery
-          </h2>
-          <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem', marginBottom: '2rem' }}>
-            Featured artwork from our rising star artist, age 4
-          </p>
-
           <div className="grid-gallery">
-            {artworks.filter(art => art.highlight).map((art) => (
+            {highlightedArtworks.map((art) => (
               <ArtCard
                 key={art.id}
                 artwork={art}
@@ -215,14 +271,26 @@ function HomePage() {
       </section>
 
       {/* Main Gallery Section */}
-      <main id="gallery" className="container" style={{ padding: '4rem 1.5rem', flex: 1 }}>
-        <div style={{ marginBottom: '2rem' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
-            <Palette size={28} color="var(--primary)" />
-            <h2 style={{ fontSize: '2rem', fontWeight: '700' }}>Explore the Gallery</h2>
-          </div>
-          <p style={{ color: 'var(--text-muted)', marginBottom: '1.5rem' }}>
-            Discover artwork by age, medium, and theme from young artists around the world.
+      <main id="gallery" className="container" style={{
+        padding: 'var(--space-16) var(--space-6)',
+        flex: 1
+      }}>
+        {/* Section Header */}
+        <div style={{ marginBottom: 'var(--space-6)' }}>
+          <h2 style={{
+            fontSize: '1.5rem',
+            fontWeight: '700',
+            fontFamily: 'var(--font-display)',
+            color: 'var(--text-main)',
+            marginBottom: 'var(--space-2)'
+          }}>
+            Explore the Gallery
+          </h2>
+          <p style={{
+            color: 'var(--text-muted)',
+            fontSize: '0.9375rem'
+          }}>
+            Discover amazing artwork from young artists around the world
           </p>
         </div>
 
@@ -234,12 +302,14 @@ function HomePage() {
           onClearFilters={handleClearFilters}
         />
 
-        {/* Results Count */}
-        <div style={{ marginBottom: '1.5rem' }}>
-          <span style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>
-            Showing <strong style={{ color: 'var(--text-main)' }}>{filteredArtworks.length}</strong> masterpiece{filteredArtworks.length !== 1 ? 's' : ''}
-            {hasActiveFilters && ' matching your filters'}
-          </span>
+        {/* Results Info */}
+        <div style={{
+          marginBottom: 'var(--space-6)',
+          color: 'var(--text-muted)',
+          fontSize: '0.875rem'
+        }}>
+          Showing <strong style={{ color: 'var(--text-main)' }}>{filteredArtworks.length}</strong> masterpiece{filteredArtworks.length !== 1 ? 's' : ''}
+          {hasActiveFilters && ' matching your filters'}
         </div>
 
         {/* Gallery Grid */}
@@ -256,16 +326,27 @@ function HomePage() {
         ) : (
           <div style={{
             textAlign: 'center',
-            padding: '4rem 2rem',
+            padding: 'var(--space-16) var(--space-8)',
             backgroundColor: 'var(--surface-alt)',
-            borderRadius: '1.5rem'
+            borderRadius: 'var(--radius-xl)'
           }}>
-            <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>🎨</div>
-            <h3 style={{ fontSize: '1.5rem', fontWeight: '700', marginBottom: '0.5rem' }}>
+            <div style={{
+              fontSize: '3rem',
+              marginBottom: 'var(--space-4)'
+            }}>🎨</div>
+            <h3 style={{
+              fontSize: '1.25rem',
+              fontWeight: '700',
+              marginBottom: 'var(--space-2)',
+              color: 'var(--text-main)'
+            }}>
               No artwork found
             </h3>
-            <p style={{ color: 'var(--text-muted)', marginBottom: '1.5rem' }}>
-              Try adjusting your filters to discover more masterpieces!
+            <p style={{
+              color: 'var(--text-muted)',
+              marginBottom: 'var(--space-6)'
+            }}>
+              Try adjusting your filters to discover more masterpieces
             </p>
             <button
               onClick={handleClearFilters}
@@ -279,17 +360,87 @@ function HomePage() {
 
       {/* Footer */}
       <footer style={{
-        backgroundColor: 'white',
-        borderTop: '1px solid var(--border)',
-        padding: '3rem 0'
+        backgroundColor: 'var(--surface)',
+        borderTop: '1px solid var(--border-light)',
+        padding: 'var(--space-10) 0'
       }}>
-        <div className="container" style={{ textAlign: 'center' }}>
-          <p style={{ color: 'var(--text-main)', fontWeight: '600', marginBottom: '0.5rem' }}>
-            © 2024 Kidzart. Made with 💜 for little artists everywhere.
-          </p>
-          <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>
-            A <span style={{ fontWeight: '600' }}>Kindora Family, Inc.</span> company. All rights reserved.
-          </p>
+        <div className="container">
+          <div style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            flexWrap: 'wrap',
+            gap: 'var(--space-4)'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
+              <div style={{
+                background: 'linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%)',
+                padding: '0.375rem',
+                borderRadius: '8px',
+                color: 'white',
+                display: 'flex'
+              }}>
+                <Palette size={18} />
+              </div>
+              <span style={{
+                fontWeight: '700',
+                fontFamily: 'var(--font-display)',
+                color: 'var(--text-main)'
+              }}>
+                Kidzart
+              </span>
+            </div>
+
+            <div style={{
+              display: 'flex',
+              gap: 'var(--space-6)',
+              alignItems: 'center',
+              flexWrap: 'wrap'
+            }}>
+              <a href="#gallery" style={{
+                color: 'var(--text-muted)',
+                fontSize: '0.875rem',
+                fontWeight: '500',
+                textDecoration: 'none'
+              }}>Gallery</a>
+              <a href="#highlights" style={{
+                color: 'var(--text-muted)',
+                fontSize: '0.875rem',
+                fontWeight: '500',
+                textDecoration: 'none'
+              }}>Featured</a>
+              <a href="/profile" style={{
+                color: 'var(--text-muted)',
+                fontSize: '0.875rem',
+                fontWeight: '500',
+                textDecoration: 'none'
+              }}>My Artists</a>
+            </div>
+          </div>
+
+          <div style={{
+            borderTop: '1px solid var(--border-light)',
+            marginTop: 'var(--space-8)',
+            paddingTop: 'var(--space-6)',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            flexWrap: 'wrap',
+            gap: 'var(--space-2)'
+          }}>
+            <p style={{
+              color: 'var(--text-muted)',
+              fontSize: '0.8125rem'
+            }}>
+              © 2024 Kidzart. Made with 💜 for little artists everywhere.
+            </p>
+            <p style={{
+              color: 'var(--text-light)',
+              fontSize: '0.8125rem'
+            }}>
+              A <span style={{ fontWeight: '600', color: 'var(--text-muted)' }}>Kindora</span> product
+            </p>
+          </div>
         </div>
       </footer>
 
