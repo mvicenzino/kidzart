@@ -1,0 +1,396 @@
+/* UploadArtModal Component Styles */
+
+.backdrop {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: var(--space-4);
+    animation: fadeIn 0.2s ease forwards;
+}
+
+.modal {
+    background-color: var(--surface);
+    border-radius: var(--radius-2xl);
+    width: 100%;
+    max-width: 600px;
+    max-height: 90vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    animation: scaleIn 0.3s ease forwards;
+}
+
+/* Header */
+.header {
+    padding: var(--space-5) var(--space-6);
+    border-bottom: 1px solid var(--border-light);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.headerContent {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+}
+
+.headerIcon {
+    width: 44px;
+    height: 44px;
+    border-radius: var(--radius-lg);
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+}
+
+.title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    font-family: var(--font-display);
+    color: var(--text-main);
+    margin: 0;
+}
+
+.subtitle {
+    color: var(--text-muted);
+    font-size: 0.875rem;
+    margin: 0;
+}
+
+/* Content */
+.content {
+    flex: 1;
+    overflow-y: auto;
+    padding: var(--space-6);
+}
+
+/* Dropzone */
+.dropzone {
+    border: 2px dashed rgba(0, 0, 0, 0.08);
+    /* Much softer dash */
+    border-radius: var(--radius-xl);
+    padding: var(--space-10);
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+    background-color: #F8FAFC;
+    /* Premium paper feel */
+    background-image: radial-gradient(#E2E8F0 1px, transparent 1px);
+    background-size: 24px 24px;
+    /* Subtle dot grid */
+}
+
+.dropzone:hover {
+    border-color: var(--primary);
+    background-color: var(--primary-bg);
+    transform: scale(1.01);
+}
+
+.dropzone.active {
+    border-color: var(--primary);
+    background-color: var(--primary-bg);
+    border-style: solid;
+    transform: scale(1.02);
+}
+
+.dropzone.hasImage {
+    padding: var(--space-4);
+    background: none;
+    border: none;
+}
+
+.dropzoneIcon {
+    width: 64px;
+    height: 64px;
+    border-radius: var(--radius-full);
+    background-color: var(--primary-bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto var(--space-4);
+}
+
+.dropzoneTitle {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-main);
+    margin-bottom: var(--space-2);
+}
+
+.dropzoneHint {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    margin-bottom: var(--space-4);
+}
+
+.dropzoneButton {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-4);
+    background-color: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-lg);
+    font-weight: 500;
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.dropzoneButton:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+.fileInput {
+    display: none;
+}
+
+/* Preview */
+.preview {
+    position: relative;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    margin-bottom: var(--space-4);
+}
+
+.previewImage {
+    width: 100%;
+    max-height: 300px;
+    object-fit: contain;
+    background-color: var(--surface-alt);
+}
+
+.removeButton {
+    position: absolute;
+    top: var(--space-2);
+    right: var(--space-2);
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-full);
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--transition-fast);
+}
+
+.removeButton:hover {
+    background-color: var(--rose);
+}
+
+/* Form */
+.form {
+    margin-top: var(--space-6);
+}
+
+.formGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-4);
+}
+
+.formGridFull {
+    grid-column: 1 / -1;
+}
+
+.field {
+    margin-bottom: var(--space-4);
+}
+
+.label {
+    display: block;
+    margin-bottom: var(--space-2);
+    font-weight: 600;
+    font-size: 0.875rem;
+    color: var(--text-main);
+}
+
+.labelHint {
+    font-weight: 400;
+    color: var(--text-muted);
+}
+
+.input {
+    width: 100%;
+    padding: var(--space-3) var(--space-4);
+    border-radius: var(--radius-lg);
+    border: 1.5px solid var(--border);
+    font-size: 0.9375rem;
+    font-family: var(--font-main);
+    outline: none;
+    transition: border-color var(--transition-fast);
+}
+
+.input:focus {
+    border-color: var(--primary);
+}
+
+.input.error {
+    border-color: var(--rose);
+}
+
+.textarea {
+    width: 100%;
+    padding: var(--space-3) var(--space-4);
+    border-radius: var(--radius-lg);
+    border: 1.5px solid var(--border);
+    font-size: 0.9375rem;
+    font-family: var(--font-main);
+    outline: none;
+    resize: vertical;
+    min-height: 80px;
+    transition: border-color var(--transition-fast);
+}
+
+.textarea:focus {
+    border-color: var(--primary);
+}
+
+.select {
+    width: 100%;
+    padding: var(--space-3) var(--space-4);
+    border-radius: var(--radius-lg);
+    border: 1.5px solid var(--border);
+    font-size: 0.9375rem;
+    font-family: var(--font-main);
+    outline: none;
+    background-color: var(--surface);
+    cursor: pointer;
+    transition: border-color var(--transition-fast);
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2364748B' d='M2.5 4.5L6 8l3.5-3.5'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right var(--space-4) center;
+    padding-right: var(--space-10);
+}
+
+.select:focus {
+    border-color: var(--primary);
+}
+
+.errorText {
+    color: var(--rose);
+    font-size: 0.8rem;
+    margin-top: var(--space-1);
+}
+
+/* Child Selector */
+.childSelector {
+    display: flex;
+    gap: var(--space-2);
+    flex-wrap: wrap;
+}
+
+.childOption {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-3);
+    border-radius: var(--radius-lg);
+    border: 1.5px solid var(--border);
+    background-color: var(--surface);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.childOption:hover {
+    border-color: var(--primary);
+}
+
+.childOption.selected {
+    border-color: var(--primary);
+    background-color: var(--primary-bg);
+}
+
+.childOptionName {
+    font-weight: 500;
+    font-size: 0.875rem;
+    color: var(--text-main);
+}
+
+.addChildButton {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-3);
+    border-radius: var(--radius-lg);
+    border: 1.5px dashed var(--border);
+    background-color: transparent;
+    cursor: pointer;
+    color: var(--text-muted);
+    font-size: 0.875rem;
+    transition: all var(--transition-fast);
+}
+
+.addChildButton:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+/* Footer */
+.footer {
+    padding: var(--space-4) var(--space-6);
+    border-top: 1px solid var(--border-light);
+    display: flex;
+    gap: var(--space-3);
+    justify-content: flex-end;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes scaleIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+    .formGrid {
+        grid-template-columns: 1fr;
+    }
+
+    .modal {
+        max-height: 95vh;
+    }
+
+    .content {
+        padding: var(--space-4);
+    }
+
+    .footer {
+        flex-direction: column;
+    }
+
+    .footer>* {
+        width: 100%;
+    }
+}

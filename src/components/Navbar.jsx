@@ -11,7 +11,7 @@ import { Palette, Upload, Menu, X } from 'lucide-react';
 import { Button } from './ui';
 import styles from './Navbar.module.css';
 
-export default function Navbar() {
+export default function Navbar({ onUploadClick }) {
     const { openSignIn } = useClerk();
     const location = useLocation();
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -71,13 +71,13 @@ export default function Navbar() {
                         >
                             Sign In
                         </Button>
-                        <Button variant="primary" size="sm" icon={Upload}>
+                        <Button variant="primary" size="sm" icon={Upload} onClick={onUploadClick}>
                             <span className={styles.desktopMenu}>Upload</span>
                         </Button>
                     </SignedOut>
 
                     <SignedIn>
-                        <Button variant="primary" size="sm" icon={Upload}>
+                        <Button variant="primary" size="sm" icon={Upload} onClick={onUploadClick}>
                             <span className={styles.desktopMenu}>Upload Art</span>
                         </Button>
                         <UserButton

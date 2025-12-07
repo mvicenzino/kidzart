@@ -1,15 +1,17 @@
 import React, { useState, useMemo } from 'react';
 import { Routes, Route } from 'react-router-dom';
-import Navbar from './components/Navbar';
+import Layout from './components/Layout';
 import ArtCard from './components/ArtCard';
 import ArtModal from './components/ArtModal';
 import FilterBar from './components/FilterBar';
 import ProfilePage from './pages/ProfilePage';
-import { artworks, taxonomy } from './data/mockData';
+import { useArtworks } from './hooks/useArtworks';
+import { taxonomy } from './data/mockData';
 import { Sparkles, ArrowRight, Palette, Users, Heart } from 'lucide-react';
 
 // Home Page Component
 function HomePage() {
+  const { artworks } = useArtworks();
   const [selectedArt, setSelectedArt] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [filters, setFilters] = useState({
@@ -44,15 +46,13 @@ function HomePage() {
       if (filters.theme !== 'all' && art.theme !== filters.theme) return false;
       return true;
     });
-  }, [filters]);
+  }, [artworks, filters]);
 
   const highlightedArtworks = artworks.filter(art => art.highlight);
   const hasActiveFilters = Object.values(filters).some(v => v !== 'all');
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-      <Navbar />
-
+    <>
       {/* Hero Section - Clean and Focused */}
       <header style={{
         padding: 'var(--space-20) 0 var(--space-16)',
@@ -99,102 +99,89 @@ function HomePage() {
               fontWeight: '600',
               color: 'var(--primary)'
             }}>
-              Celebrating Young Creativity
+              The World's Largest Kids Art Museum
             </span>
           </div>
 
-          {/* Main Headline */}
           <h1 style={{
-            fontSize: 'clamp(2.5rem, 5vw, 3.5rem)',
+            fontSize: '3.5rem',
             fontWeight: '800',
-            fontFamily: 'var(--font-display)',
-            marginBottom: 'var(--space-4)',
-            lineHeight: 1.15,
-            letterSpacing: '-0.03em',
-            color: 'var(--text-main)'
+            letterSpacing: '-0.02em',
+            lineHeight: '1.1',
+            marginBottom: 'var(--space-6)',
+            background: 'linear-gradient(135deg, var(--text-main) 0%, var(--primary) 100%)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            maxWidth: '800px',
+            marginInline: 'auto'
           }}>
-            Where Little Artists<br />
-            <span className="text-gradient">Shine Bright</span>
+            Where Little Masterpieces <br /> Get the <span style={{ color: 'var(--primary)' }}>Big Stage</span>
           </h1>
 
-          {/* Subtitle */}
           <p style={{
-            fontSize: '1.125rem',
-            color: 'var(--text-muted)',
-            maxWidth: '540px',
-            margin: '0 auto var(--space-8)',
-            lineHeight: 1.7
+            fontSize: '1.25rem',
+            color: 'var(--text-secondary)',
+            marginBottom: 'var(--space-10)',
+            maxWidth: '600px',
+            marginInline: 'auto',
+            lineHeight: '1.6'
           }}>
-            A safe gallery for parents to showcase their children's artwork
-            and connect with a community that appreciates young creativity.
+            Store, organize, and showcase your child's artwork in a beautiful digital gallery.
+            Share with family, celebrate creativity, and keep the clutter off the fridge.
           </p>
 
-          {/* CTA Buttons */}
           <div style={{
             display: 'flex',
-            gap: 'var(--space-3)',
+            gap: 'var(--space-4)',
             justifyContent: 'center',
-            flexWrap: 'wrap'
+            marginBottom: 'var(--space-16)'
           }}>
-            <a
-              href="#gallery"
-              className="btn btn-primary btn-lg"
-            >
-              <Palette size={18} />
-              Browse Gallery
-            </a>
-            <a
-              href="#highlights"
-              className="btn btn-outline btn-lg"
-            >
-              Featured Artists
-              <ArrowRight size={18} />
-            </a>
+            <button className="btn btn-primary btn-lg">
+              Start Your Gallery
+              <ArrowRight size={20} />
+            </button>
+            <button className="btn btn-outline btn-lg">
+              View Collection
+            </button>
           </div>
 
-          {/* Stats Row */}
+          {/* Stats */}
           <div style={{
             display: 'flex',
-            gap: 'var(--space-10)',
             justifyContent: 'center',
-            marginTop: 'var(--space-12)',
+            gap: 'var(--space-12)',
             flexWrap: 'wrap'
           }}>
             {[
-              { icon: Palette, value: '50+', label: 'Artworks' },
-              { icon: Users, value: '25+', label: 'Young Artists' },
-              { icon: Heart, value: '1.2k', label: 'Likes' }
-            ].map((stat, idx) => (
-              <div key={idx} style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 'var(--space-3)'
-              }}>
+              { icon: Palette, value: '1,200+', label: 'Artworks' },
+              { icon: Users, value: '450+', label: 'Young Artists' },
+              { icon: Heart, value: '15k+', label: 'Appreciations' }
+            ].map((stat, i) => (
+              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-4)' }}>
                 <div style={{
-                  width: '44px',
-                  height: '44px',
-                  borderRadius: 'var(--radius-lg)',
-                  backgroundColor: 'var(--surface)',
-                  border: '1px solid var(--border-light)',
+                  width: '48px',
+                  height: '48px',
+                  borderRadius: 'var(--radius-xl)',
+                  backgroundColor: 'white',
+                  boxShadow: 'var(--shadow-sm)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center'
                 }}>
                   <stat.icon size={20} color="var(--primary)" />
                 </div>
-                <div style={{ textAlign: 'left' }}>
+                <div>
                   <div style={{
-                    fontSize: '1.375rem',
+                    fontSize: '1.5rem',
                     fontWeight: '700',
                     color: 'var(--text-main)',
-                    lineHeight: 1.2
+                    lineHeight: '1.2'
                   }}>
                     {stat.value}
                   </div>
                   <div style={{
-                    fontSize: '0.8125rem',
-                    color: 'var(--text-muted)',
-                    fontWeight: '500'
+                    fontSize: '0.9375rem',
+                    color: 'var(--text-secondary)'
                   }}>
                     {stat.label}
                   </div>
@@ -229,7 +216,7 @@ function HomePage() {
                 borderRadius: 'var(--radius-full)',
                 marginBottom: 'var(--space-3)'
               }}>
-                <Sparkles size={14} color="var(--primary)" />
+                <Sparkles size={12} color="var(--primary)" />
                 <span style={{
                   fontSize: '0.75rem',
                   fontWeight: '700',
@@ -237,33 +224,37 @@ function HomePage() {
                   textTransform: 'uppercase',
                   letterSpacing: '0.05em'
                 }}>
-                  Featured
+                  Featured This Week
                 </span>
               </div>
               <h2 style={{
-                fontSize: '1.75rem',
+                fontSize: '2rem',
                 fontWeight: '700',
                 fontFamily: 'var(--font-display)',
                 color: 'var(--text-main)',
-                marginBottom: 'var(--space-1)'
+                margin: 0
               }}>
-                Sebastian's Gallery
+                Curator's Picks
               </h2>
-              <p style={{
-                color: 'var(--text-muted)',
-                fontSize: '0.9375rem'
-              }}>
-                Featured artwork from our rising star, age 4
-              </p>
             </div>
+            <a href="#gallery" style={{
+              color: 'var(--primary)',
+              fontWeight: '600',
+              textDecoration: 'none',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 'var(--space-2)'
+            }}>
+              View all artworks <ArrowRight size={16} />
+            </a>
           </div>
 
-          <div className="grid-gallery">
-            {highlightedArtworks.map((art) => (
+          <div className="gallery-grid" style={{ marginBottom: 0 }}>
+            {highlightedArtworks.map((artwork) => (
               <ArtCard
-                key={art.id}
-                artwork={art}
-                onClick={() => handleArtClick(art)}
+                key={artwork.id}
+                artwork={artwork}
+                onClick={() => handleArtClick(artwork)}
               />
             ))}
           </div>
@@ -278,7 +269,7 @@ function HomePage() {
         {/* Section Header */}
         <div style={{ marginBottom: 'var(--space-6)' }}>
           <h2 style={{
-            fontSize: '1.5rem',
+            fontSize: '1.75rem',
             fontWeight: '700',
             fontFamily: 'var(--font-display)',
             color: 'var(--text-main)',
@@ -288,13 +279,13 @@ function HomePage() {
           </h2>
           <p style={{
             color: 'var(--text-muted)',
-            fontSize: '0.9375rem'
+            fontSize: '1rem'
           }}>
-            Discover amazing artwork from young artists around the world
+            Discover amazing creations from young artists around the world
           </p>
         </div>
 
-        {/* Filter Bar */}
+        {/* Filters */}
         <FilterBar
           taxonomy={taxonomy}
           activeFilters={filters}
@@ -302,147 +293,55 @@ function HomePage() {
           onClearFilters={handleClearFilters}
         />
 
-        {/* Results Info */}
-        <div style={{
-          marginBottom: 'var(--space-6)',
-          color: 'var(--text-muted)',
-          fontSize: '0.875rem'
-        }}>
-          Showing <strong style={{ color: 'var(--text-main)' }}>{filteredArtworks.length}</strong> masterpiece{filteredArtworks.length !== 1 ? 's' : ''}
-          {hasActiveFilters && ' matching your filters'}
-        </div>
+        {/* Mobile Active Filters Summary (if needed) */}
+        {hasActiveFilters && (
+          <div style={{
+            display: 'none', // Hidden on desktop, could be shown on mobile if needed
+            marginBottom: 'var(--space-4)'
+          }}>
+          </div>
+        )}
 
         {/* Gallery Grid */}
         {filteredArtworks.length > 0 ? (
-          <div className="grid-gallery">
-            {filteredArtworks.map((art) => (
+          <div className="gallery-grid">
+            {filteredArtworks.map((artwork) => (
               <ArtCard
-                key={art.id}
-                artwork={art}
-                onClick={() => handleArtClick(art)}
+                key={artwork.id}
+                artwork={artwork}
+                onClick={() => handleArtClick(artwork)}
               />
             ))}
           </div>
         ) : (
           <div style={{
             textAlign: 'center',
-            padding: 'var(--space-16) var(--space-8)',
+            padding: 'var(--space-12)',
             backgroundColor: 'var(--surface-alt)',
-            borderRadius: 'var(--radius-xl)'
+            borderRadius: 'var(--radius-xl)',
+            marginTop: 'var(--space-6)'
           }}>
-            <div style={{
-              fontSize: '3rem',
-              marginBottom: 'var(--space-4)'
-            }}>🎨</div>
+            <div style={{ fontSize: '3rem', marginBottom: 'var(--space-4)' }}>🎨</div>
             <h3 style={{
               fontSize: '1.25rem',
-              fontWeight: '700',
-              marginBottom: 'var(--space-2)',
-              color: 'var(--text-main)'
+              fontWeight: '600',
+              color: 'var(--text-main)',
+              marginBottom: 'var(--space-2)'
             }}>
-              No artwork found
+              No masterpieces found
             </h3>
-            <p style={{
-              color: 'var(--text-muted)',
-              marginBottom: 'var(--space-6)'
-            }}>
-              Try adjusting your filters to discover more masterpieces
+            <p style={{ color: 'var(--text-muted)', marginBottom: 'var(--space-6)' }}>
+              Try adjusting your filters to see more artwork.
             </p>
             <button
               onClick={handleClearFilters}
-              className="btn btn-primary"
+              className="btn btn-outline"
             >
-              Clear All Filters
+              Clear all filters
             </button>
           </div>
         )}
       </main>
-
-      {/* Footer */}
-      <footer style={{
-        backgroundColor: 'var(--surface)',
-        borderTop: '1px solid var(--border-light)',
-        padding: 'var(--space-10) 0'
-      }}>
-        <div className="container">
-          <div style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            flexWrap: 'wrap',
-            gap: 'var(--space-4)'
-          }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
-              <div style={{
-                background: 'linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%)',
-                padding: '0.375rem',
-                borderRadius: '8px',
-                color: 'white',
-                display: 'flex'
-              }}>
-                <Palette size={18} />
-              </div>
-              <span style={{
-                fontWeight: '700',
-                fontFamily: 'var(--font-display)',
-                color: 'var(--text-main)'
-              }}>
-                Kidzart
-              </span>
-            </div>
-
-            <div style={{
-              display: 'flex',
-              gap: 'var(--space-6)',
-              alignItems: 'center',
-              flexWrap: 'wrap'
-            }}>
-              <a href="#gallery" style={{
-                color: 'var(--text-muted)',
-                fontSize: '0.875rem',
-                fontWeight: '500',
-                textDecoration: 'none'
-              }}>Gallery</a>
-              <a href="#highlights" style={{
-                color: 'var(--text-muted)',
-                fontSize: '0.875rem',
-                fontWeight: '500',
-                textDecoration: 'none'
-              }}>Featured</a>
-              <a href="/profile" style={{
-                color: 'var(--text-muted)',
-                fontSize: '0.875rem',
-                fontWeight: '500',
-                textDecoration: 'none'
-              }}>My Artists</a>
-            </div>
-          </div>
-
-          <div style={{
-            borderTop: '1px solid var(--border-light)',
-            marginTop: 'var(--space-8)',
-            paddingTop: 'var(--space-6)',
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            flexWrap: 'wrap',
-            gap: 'var(--space-2)'
-          }}>
-            <p style={{
-              color: 'var(--text-muted)',
-              fontSize: '0.8125rem'
-            }}>
-              © 2024 Kidzart. Made with 💜 for little artists everywhere.
-            </p>
-            <p style={{
-              color: 'var(--text-light)',
-              fontSize: '0.8125rem'
-            }}>
-              A <span style={{ fontWeight: '600', color: 'var(--text-muted)' }}>Kindora</span> product
-            </p>
-          </div>
-        </div>
-      </footer>
 
       {/* Art Modal */}
       <ArtModal
@@ -450,7 +349,7 @@ function HomePage() {
         isOpen={isModalOpen}
         onClose={handleCloseModal}
       />
-    </div>
+    </>
   );
 }
 
@@ -458,8 +357,10 @@ function HomePage() {
 function App() {
   return (
     <Routes>
-      <Route path="/" element={<HomePage />} />
-      <Route path="/profile" element={<ProfilePage />} />
+      <Route element={<Layout />}>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/profile" element={<ProfilePage />} />
+      </Route>
     </Routes>
   );
 }

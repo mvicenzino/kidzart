@@ -5,17 +5,23 @@
     flex-direction: column;
     height: 100%;
     background-color: var(--surface);
-    border-radius: var(--radius-xl);
+    border-radius: var(--radius-2xl);
+    /* Softer corners */
     overflow: hidden;
-    border: 1px solid var(--border-light);
-    transition: all var(--transition-base);
+    border: 1px solid rgba(0, 0, 0, 0.04);
+    /* Ultra-subtle border */
+    transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.4s ease;
+    /* Silky transition */
     cursor: pointer;
+    position: relative;
 }
 
 .card:hover {
     transform: translateY(-4px);
-    box-shadow: var(--shadow-lg);
-    border-color: var(--primary);
+    box-shadow: 0 12px 24px -8px rgba(0, 0, 0, 0.08), 0 4px 8px -4px rgba(0, 0, 0, 0.04);
+    /* Diffused lift */
+    border-color: rgba(99, 102, 241, 0.15);
+    /* Soft primary tint */
 }
 
 /* Image Container */
@@ -24,6 +30,7 @@
     padding-top: 75%;
     overflow: hidden;
     background-color: var(--surface-alt);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.02);
 }
 
 .image {
@@ -33,11 +40,13 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform var(--transition-slow);
+    transition: transform 0.7s cubic-bezier(0.2, 0.8, 0.2, 1);
+    /* Very slow, photographic breathing */
 }
 
 .card:hover .image {
-    transform: scale(1.04);
+    transform: scale(1.03);
+    /* Subtle zoom */
 }
 
 /* Like Button */
