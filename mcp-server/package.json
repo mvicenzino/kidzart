@@ -1,0 +1,16 @@
+{
+    "name": "kidzart-mcp-server",
+    "version": "1.0.0",
+    "description": "MCP Server for Kidzart app maintenance and fixes",
+    "main": "server.js",
+    "type": "module",
+    "scripts": {
+        "start": "node server.js",
+        "dev": "node --watch server.js"
+    },
+    "dependencies": {
+        "@modelcontextprotocol/sdk": "^0.6.0",
+        "chokidar": "^3.5.3",
+        "esbuild": "^0.19.0"
+    }
+}
