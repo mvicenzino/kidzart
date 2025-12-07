@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import {
     SignedIn,
     SignedOut,
@@ -6,7 +7,7 @@ import {
     UserButton,
     useClerk
 } from '@clerk/clerk-react';
-import { Palette, Upload, Heart, LogIn } from 'lucide-react';
+import { Palette, Upload, Heart, LogIn, User } from 'lucide-react';
 
 export default function Navbar() {
     const { openSignIn } = useClerk();
@@ -30,7 +31,7 @@ export default function Navbar() {
                 justifyContent: 'space-between',
                 height: '80px'
             }}>
-                <a href="/" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', textDecoration: 'none' }}>
+                <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', textDecoration: 'none' }}>
                     <div style={{
                         backgroundColor: 'var(--primary)',
                         padding: '0.5rem',
@@ -48,12 +49,12 @@ export default function Navbar() {
                     }}>
                         Kidz<span style={{ color: 'var(--primary)' }}>art</span>
                     </span>
-                </a>
+                </Link>
 
                 <div style={{ display: 'flex', gap: '2rem', alignItems: 'center' }} className="desktop-menu">
-                    <a href="#" style={{ textDecoration: 'none', color: 'var(--text-main)', fontWeight: 500 }}>Explore</a>
-                    <a href="#gallery" style={{ textDecoration: 'none', color: 'var(--text-main)', fontWeight: 500 }}>Gallery</a>
-                    <a href="#" style={{ textDecoration: 'none', color: 'var(--text-main)', fontWeight: 500 }}>Artists</a>
+                    <Link to="/" style={{ textDecoration: 'none', color: 'var(--text-main)', fontWeight: 500 }}>Explore</Link>
+                    <a href="/#gallery" style={{ textDecoration: 'none', color: 'var(--text-main)', fontWeight: 500 }}>Gallery</a>
+                    <Link to="/profile" style={{ textDecoration: 'none', color: 'var(--text-main)', fontWeight: 500 }}>Artists</Link>
                 </div>
 
                 <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
@@ -79,6 +80,9 @@ export default function Navbar() {
 
                     {/* Show when user is signed in */}
                     <SignedIn>
+                        <Link to="/profile" className="btn btn-outline" style={{ padding: '0.5rem', borderRadius: '50%' }}>
+                            <User size={20} />
+                        </Link>
                         <button className="btn btn-primary">
                             <Upload size={18} />
                             <span>Upload Art</span>

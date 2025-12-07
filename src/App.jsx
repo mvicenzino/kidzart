@@ -1,12 +1,15 @@
 import React, { useState, useMemo } from 'react';
+import { Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import ArtCard from './components/ArtCard';
 import ArtModal from './components/ArtModal';
 import FilterBar from './components/FilterBar';
+import ProfilePage from './pages/ProfilePage';
 import { artworks, taxonomy } from './data/mockData';
 import { Sparkles, Rocket, Gift, Palette } from 'lucide-react';
 
-function App() {
+// Home Page Component
+function HomePage() {
   const [selectedArt, setSelectedArt] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [filters, setFilters] = useState({
@@ -297,6 +300,16 @@ function App() {
         onClose={handleCloseModal}
       />
     </div>
+  );
+}
+
+// Main App with Routes
+function App() {
+  return (
+    <Routes>
+      <Route path="/" element={<HomePage />} />
+      <Route path="/profile" element={<ProfilePage />} />
+    </Routes>
   );
 }
 

@@ -1,6 +1,7 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { ClerkProvider } from '@clerk/clerk-react'
+import { BrowserRouter } from 'react-router-dom'
 import './index.css'
 import App from './App.jsx'
 
@@ -14,12 +15,18 @@ const AppWithAuth = () => {
   if (clerkEnabled) {
     return (
       <ClerkProvider publishableKey={PUBLISHABLE_KEY}>
-        <App />
+        <BrowserRouter>
+          <App />
+        </BrowserRouter>
       </ClerkProvider>
     )
   }
   // Fallback without Clerk when no key is set
-  return <App />
+  return (
+    <BrowserRouter>
+      <App />
+    </BrowserRouter>
+  )
 }
 
 createRoot(document.getElementById('root')).render(
