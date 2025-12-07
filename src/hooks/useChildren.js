@@ -62,6 +62,32 @@ export function useChildren() {
         );
     };
 
+    // Import multiple children at once (from Kindora.ai)
+    const importChildren = (newChildren) => {
+        setChildren(prev => {
+            // Check for duplicates by name to avoid re-importing same profiles
+            const existingNames = new Set(prev.map(c => c.name.toLowerCase()));
+            const uniqueNewChildren = newChildren.filter(
+                c => !existingNames.has(c.name.toLowerCase())
+            );
+
+            if (uniqueNewChildren.length < newChildren.length) {
+                const skipped = newChildren.length - uniqueNewChildren.length;
+                console.log(`Skipped ${skipped} duplicate profile(s)`);
+            }
+
+            return [...prev, ...uniqueNewChildren.map(c => ({ ...c, artworkCount: 0 }))];
+        });
+    };
+
+    // Export children data for backup or transfer
+    const exportChildren = () => {
+        const exportData = children.map(({ id, artworkCount, ...rest }) => rest);
+        const jsonString = JSON.stringify(exportData);
+        const base64 = btoa(jsonString);
+        return `KINDORA_${base64}`;
+    };
+
     return {
         children,
         isLoaded,
@@ -69,6 +95,8 @@ export function useChildren() {
         editChild,
         deleteChild,
         getChildById,
-        incrementArtworkCount
+        incrementArtworkCount,
+        importChildren,
+        exportChildren
     };
 }

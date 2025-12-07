@@ -6,7 +6,7 @@ import UserProfileSection from '../components/UserProfileSection';
 import { useChildren } from '../hooks/useChildren';
 
 export default function ProfilePage() {
-    const { children, addChild, editChild, deleteChild } = useChildren();
+    const { children, addChild, editChild, deleteChild, importChildren } = useChildren();
 
     let user = null;
     let isSignedIn = false;
@@ -87,6 +87,7 @@ export default function ProfilePage() {
                         onAddChild={addChild}
                         onEditChild={editChild}
                         onDeleteChild={deleteChild}
+                        onImportChildren={importChildren}
                     />
 
                     {/* Account Settings */}

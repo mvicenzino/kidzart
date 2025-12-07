@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { useUser } from '@clerk/clerk-react';
-import { Plus, Edit2, Trash2, Palette, Image } from 'lucide-react';
+import { Plus, Edit2, Trash2, Image, Download } from 'lucide-react';
 import ChildProfileModal from './ChildProfileModal';
+import ImportProfilesModal from './ImportProfilesModal';
 
-export default function UserProfileSection({ children, onAddChild, onEditChild, onDeleteChild }) {
+export default function UserProfileSection({ children, onAddChild, onEditChild, onDeleteChild, onImportChildren }) {
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isImportModalOpen, setIsImportModalOpen] = useState(false);
     const [editingChild, setEditingChild] = useState(null);
 
     let user = null;
@@ -33,6 +35,15 @@ export default function UserProfileSection({ children, onAddChild, onEditChild, 
         }
     };
 
+    const handleImport = (profiles) => {
+        if (onImportChildren) {
+            onImportChildren(profiles);
+        } else {
+            // Fallback: add each profile individually
+            profiles.forEach(profile => onAddChild(profile));
+        }
+    };
+
     const getAgeGroup = (age) => {
         if (age <= 3) return 'Toddler';
         if (age <= 5) return 'Preschool';
@@ -53,8 +64,10 @@ export default function UserProfileSection({ children, onAddChild, onEditChild, 
             <div style={{
                 display: 'flex',
                 justifyContent: 'space-between',
-                alignItems: 'center',
-                marginBottom: '1.5rem'
+                alignItems: 'flex-start',
+                marginBottom: '1.5rem',
+                flexWrap: 'wrap',
+                gap: '1rem'
             }}>
                 <div>
                     <h2 style={{ fontSize: '1.5rem', fontWeight: '700', marginBottom: '0.25rem' }}>
@@ -64,14 +77,24 @@ export default function UserProfileSection({ children, onAddChild, onEditChild, 
                         Manage profiles for your children's artwork
                     </p>
                 </div>
-                <button
-                    onClick={handleAddClick}
-                    className="btn btn-primary"
-                    style={{ gap: '0.5rem' }}
-                >
-                    <Plus size={18} />
-                    Add Child
-                </button>
+                <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+                    <button
+                        onClick={() => setIsImportModalOpen(true)}
+                        className="btn btn-outline"
+                        style={{ gap: '0.5rem' }}
+                    >
+                        <Download size={18} />
+                        Import from Kindora
+                    </button>
+                    <button
+                        onClick={handleAddClick}
+                        className="btn btn-primary"
+                        style={{ gap: '0.5rem' }}
+                    >
+                        <Plus size={18} />
+                        Add Child
+                    </button>
+                </div>
             </div>
 
             {/* Children Grid */}
@@ -88,10 +111,28 @@ export default function UserProfileSection({ children, onAddChild, onEditChild, 
                                 backgroundColor: 'var(--surface)',
                                 borderRadius: '1rem',
                                 padding: '1.25rem',
-                                border: '1px solid var(--border)',
-                                transition: 'all 0.2s ease'
+                                border: child.importedFrom ? '2px solid #6366F1' : '1px solid var(--border)',
+                                transition: 'all 0.2s ease',
+                                position: 'relative'
                             }}
                         >
+                            {/* Imported Badge */}
+                            {child.importedFrom && (
+                                <div style={{
+                                    position: 'absolute',
+                                    top: '-0.5rem',
+                                    right: '1rem',
+                                    backgroundColor: '#6366F1',
+                                    color: 'white',
+                                    padding: '0.2rem 0.6rem',
+                                    borderRadius: '999px',
+                                    fontSize: '0.7rem',
+                                    fontWeight: '600'
+                                }}>
+                                    From Kindora
+                                </div>
+                            )}
+
                             <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem' }}>
                                 {/* Avatar */}
                                 <div style={{
@@ -220,25 +261,41 @@ export default function UserProfileSection({ children, onAddChild, onEditChild, 
                     <h3 style={{ fontSize: '1.25rem', fontWeight: '700', marginBottom: '0.5rem' }}>
                         No artist profiles yet
                     </h3>
-                    <p style={{ color: 'var(--text-muted)', marginBottom: '1.5rem' }}>
-                        Add your child's profile to start showcasing their artwork!
+                    <p style={{ color: 'var(--text-muted)', marginBottom: '1.5rem', maxWidth: '400px', margin: '0 auto 1.5rem' }}>
+                        Add your child's profile to start showcasing their artwork, or import existing profiles from Kindora.ai!
                     </p>
-                    <button
-                        onClick={handleAddClick}
-                        className="btn btn-primary"
-                    >
-                        <Plus size={18} />
-                        Add Your First Artist
-                    </button>
+                    <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'center', flexWrap: 'wrap' }}>
+                        <button
+                            onClick={() => setIsImportModalOpen(true)}
+                            className="btn btn-outline"
+                        >
+                            <Download size={18} />
+                            Import from Kindora
+                        </button>
+                        <button
+                            onClick={handleAddClick}
+                            className="btn btn-primary"
+                        >
+                            <Plus size={18} />
+                            Add Your First Artist
+                        </button>
+                    </div>
                 </div>
             )}
 
-            {/* Modal */}
+            {/* Add/Edit Modal */}
             <ChildProfileModal
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
                 onSave={handleSave}
                 existingChild={editingChild}
+            />
+
+            {/* Import Modal */}
+            <ImportProfilesModal
+                isOpen={isImportModalOpen}
+                onClose={() => setIsImportModalOpen(false)}
+                onImport={handleImport}
             />
         </section>
     );
