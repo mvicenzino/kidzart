@@ -99,7 +99,7 @@ function HomePage() {
               fontWeight: '600',
               color: 'var(--primary)'
             }}>
-              The World's Largest Kids Art Museum
+              Your Family's Private Art Museum
             </span>
           </div>
 
@@ -112,22 +112,22 @@ function HomePage() {
             background: 'linear-gradient(135deg, var(--text-main) 0%, var(--primary) 100%)',
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
-            maxWidth: '800px',
+            maxWidth: '900px',
             marginInline: 'auto'
           }}>
-            Where Little Masterpieces <br /> Get the <span style={{ color: 'var(--primary)' }}>Big Stage</span>
+            Turn a Pile of Paper into <br /> a <span style={{ color: 'var(--primary)' }}>Lifetime of Memories</span>
           </h1>
 
           <p style={{
             fontSize: '1.25rem',
             color: 'var(--text-secondary)',
             marginBottom: 'var(--space-10)',
-            maxWidth: '600px',
+            maxWidth: '640px',
             marginInline: 'auto',
             lineHeight: '1.6'
           }}>
-            Store, organize, and showcase your child's artwork in a beautiful digital gallery.
-            Share with family, celebrate creativity, and keep the clutter off the fridge.
+            Instantly upload photos of your child's artwork. Create a beautiful, sharable digital
+            museum. Never feel guilty about "recycling" the originals again.
           </p>
 
           <div style={{
@@ -191,6 +191,76 @@ function HomePage() {
           </div>
         </div>
       </header>
+
+      {/* Social Proof Section */}
+      <section style={{
+        padding: 'var(--space-12) 0',
+        backgroundColor: 'var(--surface)'
+      }}>
+        <div className="container">
+          <div style={{
+            textAlign: 'center',
+            marginBottom: 'var(--space-10)'
+          }}>
+            <p style={{
+              textTransform: 'uppercase',
+              letterSpacing: '0.05em',
+              fontSize: '0.875rem',
+              color: 'var(--text-muted)',
+              fontWeight: '600',
+              marginBottom: 'var(--space-2)'
+            }}>
+              Trusted by 10,000+ Happy Parents
+            </p>
+          </div>
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+            gap: 'var(--space-6)'
+          }}>
+            {[
+              {
+                quote: "I finally can see my fridge door again! And my son loves scrolling through his 'museum' on the iPad.",
+                author: "Sarah J.",
+                role: "Parent of 2"
+              },
+              {
+                quote: "Grandma lives in Ohio and checks for new art every morning. It connects our family across the country.",
+                author: "Mike T.",
+                role: "Art Dad"
+              },
+              {
+                quote: "The best way to save the memories without the clutter. I wish I had this when my oldest was in preschool.",
+                author: "Emily R.",
+                role: "Mom of 3"
+              }
+            ].map((t, i) => (
+              <div key={i} style={{
+                padding: 'var(--space-6)',
+                backgroundColor: 'var(--surface-alt)',
+                borderRadius: 'var(--radius-xl)',
+                border: '1px solid var(--border-light)'
+              }}>
+                <div style={{ display: 'flex', gap: 'var(--space-1)', marginBottom: 'var(--space-3)' }}>
+                  {[1, 2, 3, 4, 5].map(s => <span key={s} style={{ color: '#FBBF24' }}>★</span>)}
+                </div>
+                <p style={{
+                  fontStyle: 'italic',
+                  color: 'var(--text-main)',
+                  marginBottom: 'var(--space-4)',
+                  lineHeight: '1.5'
+                }}>
+                  "{t.quote}"
+                </p>
+                <div>
+                  <div style={{ fontWeight: '600', fontSize: '0.9375rem' }}>{t.author}</div>
+                  <div style={{ fontSize: '0.8125rem', color: 'var(--text-muted)' }}>{t.role}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
 
       {/* Highlights Section */}
       <section id="highlights" style={{

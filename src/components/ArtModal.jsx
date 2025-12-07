@@ -190,18 +190,9 @@ export default function ArtModal({ artwork, isOpen, onClose }) {
                                 </button>
 
                                 <button
-                                    onClick={handleShare}
-                                    className={styles.actionButton}
-                                    aria-label="Share this artwork"
-                                >
-                                    <Share2 size={18} aria-hidden="true" />
-                                    <span className={styles.actionLabel}>Share</span>
-                                </button>
-
-                                <button
                                     onClick={handleDownload}
                                     className={styles.actionButton}
-                                    aria-label="Download this artwork"
+                                    aria-label="Download for Instagram or TikTok"
                                 >
                                     <Download size={18} aria-hidden="true" />
                                     <span className={styles.actionLabel}>Save</span>
@@ -209,11 +200,91 @@ export default function ArtModal({ artwork, isOpen, onClose }) {
 
                                 <button
                                     className={`${styles.actionButton} ${styles.donate}`}
-                                    aria-label="Donate to support this artist"
+                                    aria-label="Order prints and merchandise"
+                                    onClick={() => alert("KidzArt Print Shop coming soon! Pre-order custom mugs and t-shirts.")}
                                 >
                                     <Gift size={18} aria-hidden="true" />
-                                    <span className={styles.actionLabel}>Donate</span>
+                                    <span className={styles.actionLabel}>Print Shop</span>
                                 </button>
+                            </div>
+
+                            {/* Social Share Section - High Visibility for Viral Growth */}
+                            <div style={{ marginTop: 'var(--space-6)', borderTop: '1px solid var(--border-light)', paddingTop: 'var(--space-4)' }}>
+                                <p style={{
+                                    fontSize: '0.75rem',
+                                    fontWeight: '600',
+                                    color: 'var(--text-muted)',
+                                    marginBottom: 'var(--space-3)',
+                                    textTransform: 'uppercase',
+                                    letterSpacing: '0.05em'
+                                }}>
+                                    Share with Family & Friends
+                                </p>
+                                <div style={{ display: 'flex', gap: 'var(--space-3)' }}>
+                                    {[
+                                        {
+                                            name: 'Facebook',
+                                            icon: (
+                                                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                                    <path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" />
+                                                </svg>
+                                            ),
+                                            color: '#1877F2',
+                                            url: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`
+                                        },
+                                        {
+                                            name: 'X',
+                                            icon: (
+                                                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                                                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+                                                </svg>
+                                            ),
+                                            color: '#000000',
+                                            url: `https://twitter.com/intent/tweet?text=${encodeURIComponent(`Checkout this masterpiece by ${artwork.artist} on KidzArt! 🎨`)}&url=${encodeURIComponent(window.location.href)}`
+                                        },
+                                        {
+                                            name: 'LinkedIn',
+                                            icon: (
+                                                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                                                    <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
+                                                </svg>
+                                            ),
+                                            color: '#0A66C2',
+                                            url: `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(window.location.href)}`
+                                        }
+                                    ].map((social) => (
+                                        <button
+                                            key={social.name}
+                                            onClick={() => window.open(social.url, '_blank', 'width=600,height=400')}
+                                            style={{
+                                                flex: 1,
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'center',
+                                                gap: 'var(--space-2)',
+                                                padding: 'var(--space-3)',
+                                                borderRadius: 'var(--radius-lg)',
+                                                border: '1px solid var(--border-light)',
+                                                backgroundColor: 'var(--surface)',
+                                                color: social.color,
+                                                cursor: 'pointer',
+                                                transition: 'all var(--transition-fast)',
+                                                fontWeight: '600',
+                                                fontSize: '0.875rem'
+                                            }}
+                                            onMouseEnter={(e) => {
+                                                e.currentTarget.style.backgroundColor = social.color;
+                                                e.currentTarget.style.color = 'white';
+                                            }}
+                                            onMouseLeave={(e) => {
+                                                e.currentTarget.style.backgroundColor = 'var(--surface)';
+                                                e.currentTarget.style.color = social.color;
+                                            }}
+                                        >
+                                            {social.icon} {social.name}
+                                        </button>
+                                    ))}
+                                </div>
                             </div>
 
                             {/* Share Toast */}
