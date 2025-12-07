@@ -1,13 +1,15 @@
 import React, { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import FocusTrap from 'focus-trap-react';
-import { X, Heart, Share2, Download, Gift } from 'lucide-react';
+import { X, Heart, Share2, Download, Gift, TrendingUp } from 'lucide-react';
 import { Button, Badge, Avatar } from './ui';
+import DonationModal from './DonationModal';
 import styles from './ArtModal.module.css';
 
 export default function ArtModal({ artwork, isOpen, onClose }) {
     const [isLiked, setIsLiked] = useState(false);
     const [showShareToast, setShowShareToast] = useState(false);
+    const [isDonationModalOpen, setIsDonationModalOpen] = useState(false);
     const previousActiveElement = useRef(null);
 
     // Save focus and lock body scroll when modal opens
@@ -199,6 +201,16 @@ export default function ArtModal({ artwork, isOpen, onClose }) {
                                 </button>
 
                                 <button
+                                    className={`${styles.actionButton}`} // Removed styles.donate to make it secondary to the Invest button
+                                    aria-label="Invest in this child's future"
+                                    onClick={() => setIsDonationModalOpen(true)}
+                                    style={{ borderColor: 'var(--secondary)', color: 'var(--secondary)' }}
+                                >
+                                    <TrendingUp size={18} aria-hidden="true" />
+                                    <span className={styles.actionLabel}>Invest</span>
+                                </button>
+
+                                <button
                                     className={`${styles.actionButton} ${styles.donate}`}
                                     aria-label="Order prints and merchandise"
                                     onClick={() => alert("KidzArt Print Shop coming soon! Pre-order custom mugs and t-shirts.")}
@@ -286,6 +298,13 @@ export default function ArtModal({ artwork, isOpen, onClose }) {
                                     ))}
                                 </div>
                             </div>
+
+                            {/* Donation Modal - Rendered Portal-like */}
+                            <DonationModal
+                                isOpen={isDonationModalOpen}
+                                onClose={() => setIsDonationModalOpen(false)}
+                                artistName={artwork.artist}
+                            />
 
                             {/* Share Toast */}
                             {showShareToast && (
