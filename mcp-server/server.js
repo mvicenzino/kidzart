@@ -25,7 +25,7 @@ import fs from 'fs/promises';
 import path from 'path';
 
 const execAsync = promisify(exec);
-const APP_ROOT = path.resolve('../');
+const APP_ROOT = '/Users/michaelvicenzino/Documents/GitHub/kidzart';
 
 // Create server instance
 const server = new Server(

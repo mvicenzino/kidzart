@@ -1,0 +1,138 @@
+/* Modal Component Styles */
+
+.backdrop {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: var(--space-4);
+    animation: fadeIn 0.2s ease forwards;
+}
+
+.modal {
+    background-color: var(--surface);
+    border-radius: var(--radius-2xl);
+    max-height: 90vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
+    animation: modalSlideUp 0.3s ease forwards;
+}
+
+/* Sizes */
+.modal-sm {
+    width: 100%;
+    max-width: 400px;
+}
+
+.modal-md {
+    width: 100%;
+    max-width: 560px;
+}
+
+.modal-lg {
+    width: 100%;
+    max-width: 800px;
+}
+
+.modal-xl {
+    width: 100%;
+    max-width: 1000px;
+}
+
+.modal-full {
+    width: 100%;
+    max-width: calc(100vw - var(--space-8));
+    max-height: calc(100vh - var(--space-8));
+}
+
+/* Header */
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-5) var(--space-6);
+    border-bottom: 1px solid var(--border-light);
+}
+
+.title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    font-family: var(--font-display);
+    color: var(--text-main);
+    margin: 0;
+}
+
+.closeButton {
+    margin-left: auto;
+    flex-shrink: 0;
+}
+
+/* Content */
+.content {
+    flex: 1;
+    overflow-y: auto;
+    padding: var(--space-6);
+}
+
+/* Footer */
+.footer {
+    padding: var(--space-4) var(--space-6);
+    border-top: 1px solid var(--border-light);
+    display: flex;
+    gap: var(--space-3);
+    justify-content: flex-end;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes modalSlideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.98);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+    .backdrop {
+        padding: var(--space-2);
+    }
+
+    .modal {
+        max-height: 95vh;
+        border-radius: var(--radius-xl);
+    }
+
+    .header {
+        padding: var(--space-4);
+    }
+
+    .content {
+        padding: var(--space-4);
+    }
+
+    .footer {
+        padding: var(--space-3) var(--space-4);
+        flex-direction: column;
+    }
+}

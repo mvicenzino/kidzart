@@ -1,0 +1,212 @@
+/* ArtModal Component Styles */
+
+.modalContent {
+    display: flex;
+    flex-direction: row;
+    max-height: 80vh;
+}
+
+/* Image Section */
+.imageSection {
+    flex: 1 1 50%;
+    position: relative;
+    background-color: var(--surface-alt);
+    min-height: 400px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.image {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+.closeButton {
+    position: absolute;
+    top: var(--space-4);
+    left: var(--space-4);
+}
+
+/* Content Section */
+.contentSection {
+    flex: 1 1 50%;
+    padding: var(--space-8);
+    display: flex;
+    flex-direction: column;
+    overflow: auto;
+}
+
+.title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    font-family: var(--font-display);
+    margin-bottom: var(--space-4);
+    color: var(--text-main);
+    line-height: 1.3;
+}
+
+/* Artist Info */
+.artistInfo {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    margin-bottom: var(--space-5);
+}
+
+.artistDetails p {
+    margin: 0;
+}
+
+.artistName {
+    font-weight: 600;
+    color: var(--text-main);
+    font-size: 0.9375rem;
+}
+
+.artistLikes {
+    font-size: 0.8125rem;
+    color: var(--text-muted);
+}
+
+/* Description */
+.descriptionBox {
+    padding: var(--space-4);
+    background-color: var(--surface-alt);
+    border-radius: var(--radius-lg);
+    margin-bottom: var(--space-6);
+}
+
+.description {
+    color: var(--text-secondary);
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    font-style: italic;
+    margin: 0;
+}
+
+/* Details Grid */
+.detailsGrid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-3);
+    margin-bottom: var(--space-6);
+}
+
+.detailItem {
+    padding: var(--space-3);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-light);
+}
+
+.detailLabel {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-bottom: 2px;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.detailValue {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-main);
+    text-transform: capitalize;
+}
+
+/* Spacer */
+.spacer {
+    flex: 1;
+}
+
+/* Action Buttons */
+.actionsGrid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--space-2);
+}
+
+.actionButton {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: var(--space-3);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border-light);
+    background-color: var(--surface-alt);
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.actionButton:hover {
+    background-color: var(--surface);
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+.actionButton.liked {
+    background-color: rgba(236, 72, 153, 0.1);
+    border-color: var(--rose);
+    color: var(--rose);
+}
+
+.actionButton.donate {
+    background-color: rgba(245, 158, 11, 0.1);
+    border-color: var(--accent);
+    color: var(--accent-hover);
+}
+
+.actionLabel {
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+/* Toast */
+.toast {
+    margin-top: var(--space-3);
+    padding: var(--space-3);
+    background-color: var(--secondary);
+    color: white;
+    border-radius: var(--radius-md);
+    text-align: center;
+    font-size: 0.875rem;
+    font-weight: 500;
+    animation: slideUp 0.3s ease;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .modalContent {
+        flex-direction: column;
+    }
+
+    .imageSection {
+        flex: none;
+        min-height: 250px;
+    }
+
+    .contentSection {
+        padding: var(--space-5);
+    }
+
+    .actionsGrid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* Animation */
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

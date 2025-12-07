@@ -1,0 +1,179 @@
+/* UserProfileSection Component Styles */
+
+.section {
+    background-color: var(--surface);
+    border-radius: var(--radius-2xl);
+    padding: var(--space-6);
+    border: 1px solid var(--border-light);
+    box-shadow: var(--shadow-sm);
+    margin-bottom: var(--space-6);
+}
+
+/* Header */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: var(--space-5);
+    flex-wrap: wrap;
+    gap: var(--space-4);
+}
+
+.headerTitle {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin-bottom: var(--space-1);
+}
+
+.title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    font-family: var(--font-display);
+    color: var(--text-main);
+    margin: 0;
+}
+
+.subtitle {
+    color: var(--text-muted);
+    font-size: 0.875rem;
+    margin: 0;
+}
+
+.headerActions {
+    display: flex;
+    gap: var(--space-2);
+    flex-wrap: wrap;
+}
+
+/* Children Grid */
+.childrenGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: var(--space-4);
+}
+
+/* Child Card */
+.childCard {
+    background-color: var(--background);
+    border-radius: var(--radius-xl);
+    padding: var(--space-5);
+    border: 1px solid var(--border-light);
+    transition: all var(--transition-fast);
+    position: relative;
+}
+
+.childCard.imported {
+    border: 1.5px solid var(--primary);
+}
+
+.importedBadge {
+    position: absolute;
+    top: -8px;
+    right: var(--space-4);
+    background-color: var(--primary);
+    color: white;
+    padding: var(--space-1) var(--space-3);
+    border-radius: var(--radius-full);
+    font-size: 0.6875rem;
+    font-weight: 600;
+}
+
+.childContent {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-4);
+}
+
+.childInfo {
+    flex: 1;
+    min-width: 0;
+}
+
+.childName {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: var(--space-2);
+    color: var(--text-main);
+}
+
+.childBadges {
+    display: flex;
+    gap: var(--space-2);
+    align-items: center;
+    margin-bottom: var(--space-2);
+    flex-wrap: wrap;
+}
+
+.childDescription {
+    color: var(--text-muted);
+    font-size: 0.8125rem;
+    line-height: 1.5;
+    margin: 0;
+}
+
+/* Child Footer */
+.childFooter {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: var(--space-4);
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--border-light);
+}
+
+.childStats {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    color: var(--text-muted);
+    font-size: 0.8125rem;
+}
+
+.childActions {
+    display: flex;
+    gap: var(--space-1);
+}
+
+/* Empty State */
+.emptyState {
+    text-align: center;
+    padding: var(--space-12) var(--space-8);
+    background-color: var(--surface-alt);
+    border-radius: var(--radius-xl);
+}
+
+.emptyIcon {
+    width: 64px;
+    height: 64px;
+    border-radius: var(--radius-full);
+    background-color: var(--primary-bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto var(--space-4);
+    font-size: 1.75rem;
+}
+
+.emptyTitle {
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin-bottom: var(--space-2);
+    color: var(--text-main);
+}
+
+.emptyDescription {
+    color: var(--text-muted);
+    margin-bottom: var(--space-6);
+    max-width: 360px;
+    margin-left: auto;
+    margin-right: auto;
+    font-size: 0.9375rem;
+}
+
+.emptyActions {
+    display: flex;
+    gap: var(--space-3);
+    justify-content: center;
+    flex-wrap: wrap;
+}

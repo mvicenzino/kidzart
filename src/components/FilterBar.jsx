@@ -1,5 +1,7 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
+import PropTypes from 'prop-types';
 import { X, ChevronDown, Filter } from 'lucide-react';
+import styles from './FilterBar.module.css';
 
 export default function FilterBar({
     taxonomy,
@@ -8,7 +10,9 @@ export default function FilterBar({
     onClearFilters
 }) {
     const [expandedSection, setExpandedSection] = useState(null);
+    const [focusedOptionIndex, setFocusedOptionIndex] = useState(-1);
     const dropdownRef = useRef(null);
+    const optionRefs = useRef({});
 
     const filterSections = [
         {
@@ -48,6 +52,7 @@ export default function FilterBar({
         const handleClickOutside = (event) => {
             if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
                 setExpandedSection(null);
+                setFocusedOptionIndex(-1);
             }
         };
 
@@ -55,35 +60,67 @@ export default function FilterBar({
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
+    // Focus option when index changes
+    useEffect(() => {
+        if (expandedSection && focusedOptionIndex >= 0) {
+            const optionEl = optionRefs.current[`${expandedSection}-${focusedOptionIndex}`];
+            if (optionEl) {
+                optionEl.focus();
+            }
+        }
+    }, [focusedOptionIndex, expandedSection]);
+
     const toggleSection = (sectionId) => {
-        setExpandedSection(expandedSection === sectionId ? null : sectionId);
+        if (expandedSection === sectionId) {
+            setExpandedSection(null);
+            setFocusedOptionIndex(-1);
+        } else {
+            setExpandedSection(sectionId);
+            setFocusedOptionIndex(0);
+        }
     };
 
     const handleFilterSelect = (filterId, value) => {
         onFilterChange(filterId, value);
         setExpandedSection(null);
+        setFocusedOptionIndex(-1);
     };
 
+    const handleKeyDown = useCallback((e, sectionId, options) => {
+        const totalOptions = options.length + 1; // +1 for "All" option
+
+        switch (e.key) {
+            case 'ArrowDown':
+                e.preventDefault();
+                setFocusedOptionIndex(prev => (prev + 1) % totalOptions);
+                break;
+            case 'ArrowUp':
+                e.preventDefault();
+                setFocusedOptionIndex(prev => (prev - 1 + totalOptions) % totalOptions);
+                break;
+            case 'Escape':
+                e.preventDefault();
+                setExpandedSection(null);
+                setFocusedOptionIndex(-1);
+                break;
+            case 'Home':
+                e.preventDefault();
+                setFocusedOptionIndex(0);
+                break;
+            case 'End':
+                e.preventDefault();
+                setFocusedOptionIndex(totalOptions - 1);
+                break;
+        }
+    }, []);
+
     return (
-        <div style={{ marginBottom: 'var(--space-6)' }} ref={dropdownRef}>
+        <div className={styles.filterBar} ref={dropdownRef}>
             {/* Filter Pills */}
-            <div style={{
-                display: 'flex',
-                gap: 'var(--space-2)',
-                flexWrap: 'wrap',
-                alignItems: 'center'
-            }}>
-                {/* Filter Icon - Mobile indicator */}
-                <div style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 'var(--space-2)',
-                    padding: 'var(--space-2) var(--space-3)',
-                    color: 'var(--text-muted)',
-                    fontSize: '0.875rem',
-                    fontWeight: '500'
-                }}>
-                    <Filter size={16} />
+            <div className={styles.filterRow} role="group" aria-label="Gallery filters">
+                {/* Filter Label */}
+                <div className={styles.filterLabel}>
+                    <Filter size={16} aria-hidden="true" />
                     <span>Filter</span>
                 </div>
 
@@ -92,122 +129,65 @@ export default function FilterBar({
                     const activeOption = isActive
                         ? section.options.find(o => o.id === activeFilters[section.id])
                         : null;
+                    const isExpanded = expandedSection === section.id;
 
                     return (
-                        <div key={section.id} style={{ position: 'relative' }}>
+                        <div key={section.id} className={styles.filterWrapper}>
                             <button
                                 onClick={() => toggleSection(section.id)}
-                                style={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: 'var(--space-2)',
-                                    padding: 'var(--space-2) var(--space-4)',
-                                    borderRadius: 'var(--radius-lg)',
-                                    border: isActive ? '1.5px solid var(--primary)' : '1.5px solid var(--border)',
-                                    backgroundColor: isActive ? 'var(--primary-bg)' : 'var(--surface)',
-                                    color: isActive ? 'var(--primary)' : 'var(--text-secondary)',
-                                    fontWeight: '500',
-                                    fontSize: '0.875rem',
-                                    cursor: 'pointer',
-                                    transition: 'all var(--transition-fast)'
-                                }}
+                                className={`${styles.filterButton} ${isActive ? styles.active : ''}`}
+                                aria-expanded={isExpanded}
+                                aria-haspopup="listbox"
+                                aria-controls={`${section.id}-listbox`}
                             >
-                                {activeOption && (
-                                    <span>{activeOption.emoji}</span>
-                                )}
-                                <span>
-                                    {isActive ? activeOption?.label : section.label}
-                                </span>
+                                {activeOption && <span aria-hidden="true">{activeOption.emoji}</span>}
+                                <span>{isActive ? activeOption?.label : section.label}</span>
                                 <ChevronDown
                                     size={14}
-                                    style={{
-                                        transform: expandedSection === section.id ? 'rotate(180deg)' : 'rotate(0)',
-                                        transition: 'transform var(--transition-fast)'
-                                    }}
+                                    className={`${styles.chevron} ${isExpanded ? styles.open : ''}`}
+                                    aria-hidden="true"
                                 />
                             </button>
 
                             {/* Dropdown */}
-                            {expandedSection === section.id && (
-                                <div style={{
-                                    position: 'absolute',
-                                    top: 'calc(100% + var(--space-2))',
-                                    left: 0,
-                                    backgroundColor: 'var(--surface)',
-                                    borderRadius: 'var(--radius-xl)',
-                                    boxShadow: 'var(--shadow-xl)',
-                                    border: '1px solid var(--border-light)',
-                                    minWidth: '200px',
-                                    maxHeight: '320px',
-                                    overflowY: 'auto',
-                                    zIndex: 50,
-                                    padding: 'var(--space-2)',
-                                    animation: 'slideUp 0.2s ease'
-                                }}>
+                            {isExpanded && (
+                                <div
+                                    role="listbox"
+                                    id={`${section.id}-listbox`}
+                                    aria-label={`Filter by ${section.label}`}
+                                    className={styles.dropdown}
+                                    onKeyDown={(e) => handleKeyDown(e, section.id, section.options)}
+                                >
                                     {/* All Option */}
                                     <button
+                                        ref={el => optionRefs.current[`${section.id}-0`] = el}
                                         onClick={() => handleFilterSelect(section.id, 'all')}
-                                        style={{
-                                            width: '100%',
-                                            padding: 'var(--space-3) var(--space-4)',
-                                            textAlign: 'left',
-                                            border: 'none',
-                                            backgroundColor: !isActive ? 'var(--surface-alt)' : 'transparent',
-                                            borderRadius: 'var(--radius-md)',
-                                            cursor: 'pointer',
-                                            fontWeight: !isActive ? '600' : '400',
-                                            color: 'var(--text-main)',
-                                            fontSize: '0.875rem',
-                                            transition: 'all var(--transition-fast)'
-                                        }}
+                                        className={`${styles.dropdownOption} ${styles.allOption} ${!isActive ? styles.active : ''}`}
+                                        role="option"
+                                        aria-selected={!isActive}
+                                        tabIndex={focusedOptionIndex === 0 ? 0 : -1}
                                     >
                                         All {section.label}s
                                     </button>
 
-                                    {/* Divider */}
-                                    <div style={{
-                                        height: '1px',
-                                        backgroundColor: 'var(--border-light)',
-                                        margin: 'var(--space-2) 0'
-                                    }} />
+                                    <div className={styles.divider} role="separator" />
 
                                     {/* Options */}
-                                    {section.options.map((option) => (
+                                    {section.options.map((option, index) => (
                                         <button
                                             key={option.id}
+                                            ref={el => optionRefs.current[`${section.id}-${index + 1}`] = el}
                                             onClick={() => handleFilterSelect(section.id, option.id)}
-                                            style={{
-                                                width: '100%',
-                                                padding: 'var(--space-3) var(--space-4)',
-                                                textAlign: 'left',
-                                                border: 'none',
-                                                backgroundColor: activeFilters[section.id] === option.id
-                                                    ? 'var(--primary-bg)'
-                                                    : 'transparent',
-                                                borderRadius: 'var(--radius-md)',
-                                                cursor: 'pointer',
-                                                fontWeight: activeFilters[section.id] === option.id ? '600' : '400',
-                                                color: activeFilters[section.id] === option.id
-                                                    ? 'var(--primary)'
-                                                    : 'var(--text-main)',
-                                                fontSize: '0.875rem',
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                gap: 'var(--space-3)',
-                                                transition: 'all var(--transition-fast)'
-                                            }}
+                                            className={`${styles.dropdownOption} ${activeFilters[section.id] === option.id ? styles.active : ''}`}
+                                            role="option"
+                                            aria-selected={activeFilters[section.id] === option.id}
+                                            tabIndex={focusedOptionIndex === index + 1 ? 0 : -1}
                                         >
-                                            <span style={{ fontSize: '1rem' }}>{option.emoji}</span>
-                                            <div>
-                                                <div>{option.label}</div>
+                                            <span className={styles.optionEmoji} aria-hidden="true">{option.emoji}</span>
+                                            <div className={styles.optionLabel}>
+                                                <span>{option.label}</span>
                                                 {option.sublabel && (
-                                                    <div style={{
-                                                        fontSize: '0.75rem',
-                                                        color: 'var(--text-muted)',
-                                                        marginTop: '2px'
-                                                    }}>
-                                                        {option.sublabel}
-                                                    </div>
+                                                    <span className={styles.optionSublabel}>{option.sublabel}</span>
                                                 )}
                                             </div>
                                         </button>
@@ -222,22 +202,10 @@ export default function FilterBar({
                 {activeFilterCount > 0 && (
                     <button
                         onClick={onClearFilters}
-                        style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: 'var(--space-1)',
-                            padding: 'var(--space-2) var(--space-3)',
-                            borderRadius: 'var(--radius-lg)',
-                            border: 'none',
-                            backgroundColor: 'var(--rose)',
-                            color: 'white',
-                            fontWeight: '500',
-                            fontSize: '0.8125rem',
-                            cursor: 'pointer',
-                            transition: 'all var(--transition-fast)'
-                        }}
+                        className={styles.clearButton}
+                        aria-label={`Clear all ${activeFilterCount} filters`}
                     >
-                        <X size={14} />
+                        <X size={14} aria-hidden="true" />
                         Clear ({activeFilterCount})
                     </button>
                 )}
@@ -245,20 +213,8 @@ export default function FilterBar({
 
             {/* Active Filters Pills */}
             {activeFilterCount > 0 && (
-                <div style={{
-                    marginTop: 'var(--space-4)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 'var(--space-2)',
-                    flexWrap: 'wrap'
-                }}>
-                    <span style={{
-                        color: 'var(--text-muted)',
-                        fontSize: '0.8125rem',
-                        fontWeight: '500'
-                    }}>
-                        Active:
-                    </span>
+                <div className={styles.activeFiltersRow} role="region" aria-label="Active filters">
+                    <span className={styles.activeLabel}>Active:</span>
                     {Object.entries(activeFilters).map(([key, value]) => {
                         if (!value || value === 'all') return null;
                         const section = filterSections.find(s => s.id === key);
@@ -266,36 +222,15 @@ export default function FilterBar({
                         if (!option) return null;
 
                         return (
-                            <span
-                                key={key}
-                                style={{
-                                    display: 'inline-flex',
-                                    alignItems: 'center',
-                                    gap: 'var(--space-2)',
-                                    padding: 'var(--space-1) var(--space-3)',
-                                    backgroundColor: 'var(--primary)',
-                                    color: 'white',
-                                    borderRadius: 'var(--radius-full)',
-                                    fontSize: '0.8125rem',
-                                    fontWeight: '500'
-                                }}
-                            >
-                                <span>{option.emoji}</span>
+                            <span key={key} className={styles.activeFilterPill}>
+                                <span aria-hidden="true">{option.emoji}</span>
                                 {option.label}
                                 <button
                                     onClick={() => onFilterChange(key, 'all')}
-                                    style={{
-                                        background: 'none',
-                                        border: 'none',
-                                        color: 'white',
-                                        cursor: 'pointer',
-                                        padding: 0,
-                                        display: 'flex',
-                                        opacity: 0.8
-                                    }}
+                                    className={styles.removeFilterButton}
                                     aria-label={`Remove ${option.label} filter`}
                                 >
-                                    <X size={14} />
+                                    <X size={14} aria-hidden="true" />
                                 </button>
                             </span>
                         );
@@ -305,3 +240,27 @@ export default function FilterBar({
         </div>
     );
 }
+
+FilterBar.propTypes = {
+    taxonomy: PropTypes.shape({
+        ageGroups: PropTypes.arrayOf(PropTypes.shape({
+            id: PropTypes.string.isRequired,
+            label: PropTypes.string.isRequired,
+            range: PropTypes.string,
+            emoji: PropTypes.string
+        })).isRequired,
+        mediums: PropTypes.arrayOf(PropTypes.shape({
+            id: PropTypes.string.isRequired,
+            label: PropTypes.string.isRequired,
+            emoji: PropTypes.string
+        })).isRequired,
+        themes: PropTypes.arrayOf(PropTypes.shape({
+            id: PropTypes.string.isRequired,
+            label: PropTypes.string.isRequired,
+            emoji: PropTypes.string
+        })).isRequired
+    }).isRequired,
+    activeFilters: PropTypes.object.isRequired,
+    onFilterChange: PropTypes.func.isRequired,
+    onClearFilters: PropTypes.func.isRequired
+};

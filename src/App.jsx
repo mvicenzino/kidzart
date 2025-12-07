@@ -271,7 +271,7 @@ function HomePage() {
       </section>
 
       {/* Main Gallery Section */}
-      <main id="gallery" className="container" style={{
+      <main id="main-content" className="container" style={{
         padding: 'var(--space-16) var(--space-6)',
         flex: 1
       }}>

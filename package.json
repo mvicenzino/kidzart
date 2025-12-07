@@ -12,7 +12,9 @@
   "dependencies": {
     "@clerk/clerk-react": "^5.58.0",
     "@supabase/supabase-js": "^2.86.2",
+    "focus-trap-react": "^11.0.4",
     "lucide-react": "^0.556.0",
+    "prop-types": "^15.8.1",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-router-dom": "^7.10.1"

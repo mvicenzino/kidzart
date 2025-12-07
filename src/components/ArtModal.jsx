@@ -1,16 +1,26 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import PropTypes from 'prop-types';
+import FocusTrap from 'focus-trap-react';
 import { X, Heart, Share2, Download, Gift } from 'lucide-react';
+import { Button, Badge, Avatar } from './ui';
+import styles from './ArtModal.module.css';
 
 export default function ArtModal({ artwork, isOpen, onClose }) {
     const [isLiked, setIsLiked] = useState(false);
     const [showShareToast, setShowShareToast] = useState(false);
+    const previousActiveElement = useRef(null);
 
-    // Lock body scroll when modal is open
+    // Save focus and lock body scroll when modal opens
     useEffect(() => {
         if (isOpen) {
+            previousActiveElement.current = document.activeElement;
             document.body.style.overflow = 'hidden';
         } else {
             document.body.style.overflow = '';
+            // Restore focus when modal closes
+            if (previousActiveElement.current) {
+                previousActiveElement.current.focus();
+            }
         }
         return () => {
             document.body.style.overflow = '';
@@ -22,9 +32,11 @@ export default function ArtModal({ artwork, isOpen, onClose }) {
         const handleEscape = (e) => {
             if (e.key === 'Escape') onClose();
         };
-        window.addEventListener('keydown', handleEscape);
+        if (isOpen) {
+            window.addEventListener('keydown', handleEscape);
+        }
         return () => window.removeEventListener('keydown', handleEscape);
-    }, [onClose]);
+    }, [onClose, isOpen]);
 
     if (!isOpen || !artwork) return null;
 
@@ -55,311 +67,183 @@ export default function ArtModal({ artwork, isOpen, onClose }) {
         document.body.removeChild(link);
     };
 
-    return (
-        <div
-            style={{
-                position: 'fixed',
-                inset: 0,
-                backgroundColor: 'rgba(0, 0, 0, 0.75)',
-                backdropFilter: 'blur(8px)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                zIndex: 1000,
-                padding: 'var(--space-4)',
-                animation: 'fadeIn 0.2s ease'
-            }}
-            onClick={onClose}
-        >
-            <style>{`
-                @keyframes fadeIn {
-                    from { opacity: 0; }
-                    to { opacity: 1; }
-                }
-                @keyframes slideUp {
-                    from { opacity: 0; transform: translateY(20px) scale(0.98); }
-                    to { opacity: 1; transform: translateY(0) scale(1); }
-                }
-            `}</style>
+    const handleBackdropClick = (e) => {
+        if (e.target === e.currentTarget) {
+            onClose();
+        }
+    };
 
+    return (
+        <FocusTrap active={isOpen}>
             <div
+                className="animate-fade-in"
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="modal-title"
                 style={{
-                    backgroundColor: 'var(--surface)',
-                    borderRadius: 'var(--radius-2xl)',
-                    maxWidth: '900px',
-                    width: '100%',
-                    maxHeight: '90vh',
-                    overflow: 'hidden',
-                    display: 'flex',
-                    flexDirection: 'row',
-                    boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.4)',
-                    animation: 'slideUp 0.3s ease'
-                }}
-                onClick={(e) => e.stopPropagation()}
-            >
-                {/* Image Section */}
-                <div style={{
-                    flex: '1 1 50%',
-                    position: 'relative',
-                    backgroundColor: 'var(--surface-alt)',
-                    minHeight: '400px',
+                    position: 'fixed',
+                    inset: 0,
+                    backgroundColor: 'rgba(0, 0, 0, 0.75)',
+                    backdropFilter: 'blur(8px)',
                     display: 'flex',
                     alignItems: 'center',
-                    justifyContent: 'center'
-                }}>
-                    <img
-                        src={artwork.imageUrl}
-                        alt={artwork.title}
-                        style={{
-                            maxWidth: '100%',
-                            maxHeight: '100%',
-                            objectFit: 'contain'
-                        }}
-                    />
+                    justifyContent: 'center',
+                    zIndex: 1000,
+                    padding: 'var(--space-4)'
+                }}
+                onClick={handleBackdropClick}
+            >
+                <div
+                    className="animate-modal"
+                    style={{
+                        backgroundColor: 'var(--surface)',
+                        borderRadius: 'var(--radius-2xl)',
+                        maxWidth: '900px',
+                        width: '100%',
+                        maxHeight: '90vh',
+                        overflow: 'hidden',
+                        boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.4)'
+                    }}
+                    onClick={(e) => e.stopPropagation()}
+                >
+                    <div className={styles.modalContent}>
+                        {/* Image Section */}
+                        <div className={styles.imageSection}>
+                            <img
+                                src={artwork.imageUrl}
+                                alt={artwork.title}
+                                className={styles.image}
+                            />
 
-                    {/* Close Button */}
-                    <button
-                        onClick={onClose}
-                        style={{
-                            position: 'absolute',
-                            top: 'var(--space-4)',
-                            left: 'var(--space-4)',
-                            width: '40px',
-                            height: '40px',
-                            borderRadius: 'var(--radius-full)',
-                            backgroundColor: 'rgba(255, 255, 255, 0.95)',
-                            border: 'none',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            cursor: 'pointer',
-                            boxShadow: 'var(--shadow-md)',
-                            transition: 'all var(--transition-fast)'
-                        }}
-                        aria-label="Close modal"
-                    >
-                        <X size={18} color="var(--text-main)" />
-                    </button>
-                </div>
-
-                {/* Content Section */}
-                <div style={{
-                    flex: '1 1 50%',
-                    padding: 'var(--space-8)',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    overflow: 'auto'
-                }}>
-                    {/* Age Badge */}
-                    <div style={{ marginBottom: 'var(--space-3)' }}>
-                        <span className="badge">Age {artwork.age}</span>
-                    </div>
-
-                    {/* Title */}
-                    <h2 style={{
-                        fontSize: '1.5rem',
-                        fontWeight: '700',
-                        fontFamily: 'var(--font-display)',
-                        marginBottom: 'var(--space-4)',
-                        color: 'var(--text-main)',
-                        lineHeight: 1.3
-                    }}>
-                        {artwork.title}
-                    </h2>
-
-                    {/* Artist Info */}
-                    <div style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 'var(--space-3)',
-                        marginBottom: 'var(--space-5)'
-                    }}>
-                        <div style={{
-                            width: '44px',
-                            height: '44px',
-                            borderRadius: 'var(--radius-full)',
-                            background: 'linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%)',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            color: 'white',
-                            fontWeight: '700',
-                            fontSize: '1rem'
-                        }}>
-                            {artwork.artist.charAt(0)}
+                            {/* Close Button */}
+                            <div className={styles.closeButton}>
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    icon={X}
+                                    onClick={onClose}
+                                    aria-label="Close modal"
+                                    style={{
+                                        backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                                        borderRadius: 'var(--radius-full)',
+                                        width: '40px',
+                                        height: '40px'
+                                    }}
+                                />
+                            </div>
                         </div>
-                        <div>
-                            <p style={{
-                                fontWeight: '600',
-                                color: 'var(--text-main)',
-                                fontSize: '0.9375rem'
-                            }}>
-                                {artwork.artist}
-                            </p>
-                            <p style={{
-                                fontSize: '0.8125rem',
-                                color: 'var(--text-muted)'
-                            }}>
-                                {artwork.likes} likes
-                            </p>
-                        </div>
-                    </div>
 
-                    {/* Description */}
-                    <div style={{
-                        padding: 'var(--space-4)',
-                        backgroundColor: 'var(--surface-alt)',
-                        borderRadius: 'var(--radius-lg)',
-                        marginBottom: 'var(--space-6)'
-                    }}>
-                        <p style={{
-                            color: 'var(--text-secondary)',
-                            fontSize: '0.9375rem',
-                            lineHeight: 1.6,
-                            fontStyle: 'italic'
-                        }}>
-                            "{artwork.description}"
-                        </p>
-                    </div>
+                        {/* Content Section */}
+                        <div className={styles.contentSection}>
+                            {/* Age Badge */}
+                            <div style={{ marginBottom: 'var(--space-3)' }}>
+                                <Badge variant="primary">Age {artwork.age}</Badge>
+                            </div>
 
-                    {/* Artwork Details */}
-                    <div style={{
-                        display: 'grid',
-                        gridTemplateColumns: 'repeat(2, 1fr)',
-                        gap: 'var(--space-3)',
-                        marginBottom: 'var(--space-6)'
-                    }}>
-                        {[
-                            { label: 'Medium', value: artwork.medium },
-                            { label: 'Theme', value: artwork.theme },
-                            { label: 'Category', value: artwork.category },
-                            { label: 'Style', value: artwork.style }
-                        ].map((detail) => (
-                            <div key={detail.label} style={{
-                                padding: 'var(--space-3)',
-                                borderRadius: 'var(--radius-md)',
-                                border: '1px solid var(--border-light)'
-                            }}>
-                                <div style={{
-                                    fontSize: '0.75rem',
-                                    color: 'var(--text-muted)',
-                                    marginBottom: '2px',
-                                    textTransform: 'uppercase',
-                                    letterSpacing: '0.03em'
-                                }}>
-                                    {detail.label}
-                                </div>
-                                <div style={{
-                                    fontSize: '0.875rem',
-                                    fontWeight: '500',
-                                    color: 'var(--text-main)',
-                                    textTransform: 'capitalize'
-                                }}>
-                                    {detail.value?.replace('-', ' ')}
+                            {/* Title */}
+                            <h2 id="modal-title" className={styles.title}>{artwork.title}</h2>
+
+                            {/* Artist Info */}
+                            <div className={styles.artistInfo}>
+                                <Avatar initials={artwork.artist.charAt(0)} size="md" />
+                                <div className={styles.artistDetails}>
+                                    <p className={styles.artistName}>{artwork.artist}</p>
+                                    <p className={styles.artistLikes}>{artwork.likes} likes</p>
                                 </div>
                             </div>
-                        ))}
-                    </div>
 
-                    {/* Spacer */}
-                    <div style={{ flex: 1 }} />
+                            {/* Description */}
+                            <div className={styles.descriptionBox}>
+                                <p className={styles.description}>"{artwork.description}"</p>
+                            </div>
 
-                    {/* Action Buttons */}
-                    <div style={{
-                        display: 'grid',
-                        gridTemplateColumns: 'repeat(4, 1fr)',
-                        gap: 'var(--space-2)'
-                    }}>
-                        <button
-                            onClick={() => setIsLiked(!isLiked)}
-                            className="btn"
-                            style={{
-                                flexDirection: 'column',
-                                padding: 'var(--space-3)',
-                                backgroundColor: isLiked ? 'rgba(236, 72, 153, 0.1)' : 'var(--surface-alt)',
-                                color: isLiked ? 'var(--rose)' : 'var(--text-secondary)',
-                                border: isLiked ? '1px solid var(--rose)' : '1px solid var(--border-light)'
-                            }}
-                        >
-                            <Heart size={18} fill={isLiked ? 'var(--rose)' : 'none'} />
-                            <span style={{ fontSize: '0.75rem', marginTop: '4px' }}>Like</span>
-                        </button>
+                            {/* Artwork Details */}
+                            <div className={styles.detailsGrid}>
+                                {[
+                                    { label: 'Medium', value: artwork.medium },
+                                    { label: 'Theme', value: artwork.theme },
+                                    { label: 'Category', value: artwork.category },
+                                    { label: 'Style', value: artwork.style }
+                                ].map((detail) => (
+                                    <div key={detail.label} className={styles.detailItem}>
+                                        <div className={styles.detailLabel}>{detail.label}</div>
+                                        <div className={styles.detailValue}>
+                                            {detail.value?.replace('-', ' ')}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
 
-                        <button
-                            onClick={handleShare}
-                            className="btn"
-                            style={{
-                                flexDirection: 'column',
-                                padding: 'var(--space-3)',
-                                backgroundColor: 'var(--surface-alt)',
-                                color: 'var(--text-secondary)',
-                                border: '1px solid var(--border-light)'
-                            }}
-                        >
-                            <Share2 size={18} />
-                            <span style={{ fontSize: '0.75rem', marginTop: '4px' }}>Share</span>
-                        </button>
+                            {/* Spacer */}
+                            <div className={styles.spacer} />
 
-                        <button
-                            onClick={handleDownload}
-                            className="btn"
-                            style={{
-                                flexDirection: 'column',
-                                padding: 'var(--space-3)',
-                                backgroundColor: 'var(--surface-alt)',
-                                color: 'var(--text-secondary)',
-                                border: '1px solid var(--border-light)'
-                            }}
-                        >
-                            <Download size={18} />
-                            <span style={{ fontSize: '0.75rem', marginTop: '4px' }}>Save</span>
-                        </button>
+                            {/* Action Buttons */}
+                            <div className={styles.actionsGrid} role="group" aria-label="Artwork actions">
+                                <button
+                                    onClick={() => setIsLiked(!isLiked)}
+                                    className={`${styles.actionButton} ${isLiked ? styles.liked : ''}`}
+                                    aria-label="Like this artwork"
+                                    aria-pressed={isLiked}
+                                >
+                                    <Heart size={18} fill={isLiked ? 'currentColor' : 'none'} aria-hidden="true" />
+                                    <span className={styles.actionLabel}>Like</span>
+                                </button>
 
-                        <button
-                            className="btn"
-                            style={{
-                                flexDirection: 'column',
-                                padding: 'var(--space-3)',
-                                backgroundColor: 'rgba(245, 158, 11, 0.1)',
-                                color: 'var(--accent-hover)',
-                                border: '1px solid var(--accent)'
-                            }}
-                        >
-                            <Gift size={18} />
-                            <span style={{ fontSize: '0.75rem', marginTop: '4px' }}>Donate</span>
-                        </button>
-                    </div>
+                                <button
+                                    onClick={handleShare}
+                                    className={styles.actionButton}
+                                    aria-label="Share this artwork"
+                                >
+                                    <Share2 size={18} aria-hidden="true" />
+                                    <span className={styles.actionLabel}>Share</span>
+                                </button>
 
-                    {/* Share Toast */}
-                    {showShareToast && (
-                        <div style={{
-                            marginTop: 'var(--space-3)',
-                            padding: 'var(--space-3)',
-                            backgroundColor: 'var(--secondary)',
-                            color: 'white',
-                            borderRadius: 'var(--radius-md)',
-                            textAlign: 'center',
-                            fontSize: '0.875rem',
-                            fontWeight: '500'
-                        }}>
-                            Link copied to clipboard!
+                                <button
+                                    onClick={handleDownload}
+                                    className={styles.actionButton}
+                                    aria-label="Download this artwork"
+                                >
+                                    <Download size={18} aria-hidden="true" />
+                                    <span className={styles.actionLabel}>Save</span>
+                                </button>
+
+                                <button
+                                    className={`${styles.actionButton} ${styles.donate}`}
+                                    aria-label="Donate to support this artist"
+                                >
+                                    <Gift size={18} aria-hidden="true" />
+                                    <span className={styles.actionLabel}>Donate</span>
+                                </button>
+                            </div>
+
+                            {/* Share Toast */}
+                            {showShareToast && (
+                                <div className={styles.toast} role="status" aria-live="polite">
+                                    Link copied to clipboard!
+                                </div>
+                            )}
                         </div>
-                    )}
+                    </div>
                 </div>
             </div>
-
-            {/* Mobile Responsive Styles */}
-            <style>{`
-                @media (max-width: 768px) {
-                    div[style*="flex-direction: row"] {
-                        flex-direction: column !important;
-                    }
-                    div[style*="flex: 1 1 50%"] {
-                        flex: none !important;
-                        min-height: 250px !important;
-                    }
-                }
-            `}</style>
-        </div>
+        </FocusTrap>
     );
 }
+
+ArtModal.propTypes = {
+    artwork: PropTypes.shape({
+        id: PropTypes.number.isRequired,
+        title: PropTypes.string.isRequired,
+        artist: PropTypes.string.isRequired,
+        age: PropTypes.number.isRequired,
+        imageUrl: PropTypes.string.isRequired,
+        description: PropTypes.string,
+        likes: PropTypes.number,
+        medium: PropTypes.string,
+        theme: PropTypes.string,
+        category: PropTypes.string,
+        style: PropTypes.string
+    }),
+    isOpen: PropTypes.bool.isRequired,
+    onClose: PropTypes.func.isRequired
+};

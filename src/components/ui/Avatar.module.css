@@ -1,0 +1,53 @@
+/* Avatar Component Styles */
+
+.avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-full);
+    font-weight: 600;
+    flex-shrink: 0;
+    object-fit: cover;
+}
+
+/* Sizes */
+.avatar-xs {
+    width: 24px;
+    height: 24px;
+    font-size: 0.75rem;
+}
+
+.avatar-sm {
+    width: 32px;
+    height: 32px;
+    font-size: 0.875rem;
+}
+
+.avatar-md {
+    width: 44px;
+    height: 44px;
+    font-size: 1.25rem;
+}
+
+.avatar-lg {
+    width: 56px;
+    height: 56px;
+    font-size: 1.5rem;
+}
+
+.avatar-xl {
+    width: 72px;
+    height: 72px;
+    font-size: 2rem;
+}
+
+/* Gradient background */
+.gradient {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+    color: white;
+}
+
+/* Image avatar with border */
+img.avatar {
+    border: 3px solid var(--surface-alt);
+}

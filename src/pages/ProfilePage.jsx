@@ -7,17 +7,7 @@ import { useChildren } from '../hooks/useChildren';
 
 export default function ProfilePage() {
     const { children, addChild, editChild, deleteChild, importChildren } = useChildren();
-
-    let user = null;
-    let isSignedIn = false;
-
-    try {
-        const clerkUser = useUser();
-        user = clerkUser.user;
-        isSignedIn = clerkUser.isSignedIn;
-    } catch (e) {
-        // Clerk not configured
-    }
+    const { user, isSignedIn } = useUser();
 
     return (
         <div style={{ minHeight: '100vh', backgroundColor: 'var(--background)' }}>

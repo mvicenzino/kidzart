@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 import { ClerkProvider } from '@clerk/clerk-react'
 import { BrowserRouter } from 'react-router-dom'
 import './index.css'
+import './styles/animations.css'
 import App from './App.jsx'
 
 // Get Clerk publishable key from environment
