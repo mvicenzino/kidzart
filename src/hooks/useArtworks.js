@@ -31,8 +31,8 @@ export function useArtworks() {
         }
     }, [userArtworks, isLoaded]);
 
-    // Combine mock artworks with user uploads
-    const allArtworks = [...userArtworks, ...mockArtworks];
+    // Combine mock artworks with user uploads and filter invalid images
+    const allArtworks = [...userArtworks, ...mockArtworks].filter(art => art.imageUrl && art.imageUrl.trim() !== '');
 
     const addArtwork = (artwork) => {
         const newArtwork = {

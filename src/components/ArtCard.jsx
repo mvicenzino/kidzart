@@ -6,6 +6,9 @@ import styles from './ArtCard.module.css';
 
 export default function ArtCard({ artwork, onClick }) {
     const [isLiked, setIsLiked] = useState(false);
+    const [imageError, setImageError] = useState(false);
+
+    if (imageError) return null;
 
     const handleLikeClick = (e) => {
         e.stopPropagation();
@@ -34,6 +37,7 @@ export default function ArtCard({ artwork, onClick }) {
                     src={artwork.imageUrl}
                     alt={artwork.title}
                     className={styles.image}
+                    onError={() => setImageError(true)}
                 />
 
                 {/* Like Button */}
