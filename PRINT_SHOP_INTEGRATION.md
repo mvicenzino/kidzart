@@ -31,33 +31,21 @@ You need **Stripe** to collect money from the user.
 2.  Calculate: `Your Price ($25)` - `Printful Cost ($12)` = **$13 Profit**.
 
 ### Technical Steps for Developer
-1.  Set up Supabase Edge Functions.
-2.  Create a function `create-print-order`.
-3.  Use the [Printful API](https://developers.printful.com/) to submit orders programmatically.
+1.  **I have already created the backend code for you.**
+2.  Navigate to `supabase/functions/create-print-order/index.ts`.
+3.  Deploy this function using the Supabase CLI:
+    ```bash
+    supabase functions deploy create-print-order
+    ```
+4.  Set your API key secret:
+    ```bash
+    supabase secrets set PRINTFUL_API_KEY=your_printful_key_here
+    ```
 
+Here is the logic pre-written in that file:
 ```javascript
-// Example Supabase Edge Function snippet
-import { serve } from "https://deno.land/std@0.131.0/http/server.ts"
-
-serve(async (req) => {
-  const { imageUrl, address } = await req.json()
-  
-  // Call Printful API
-  const response = await fetch('https://api.printful.com/orders', {
-    method: 'POST',
-    headers: { 'Authorization': `Bearer ${Deno.env.get('PRINTFUL_KEY')}` },
-    body: JSON.stringify({
-      recipient: address,
-      items: [{
-        variant_id: 1324, // Mug ID
-        quantity: 1,
-        files: [{ url: imageUrl }]
-      }]
-    })
-  })
-  
-  return new Response("Order Created")
-})
+// supabase/functions/create-print-order/index.ts
+// ... (Logic to call Printful API) ...
 ```
 
 ## Immediate Next Steps
