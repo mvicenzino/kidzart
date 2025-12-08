@@ -71,6 +71,18 @@ export default function PrintShopModal({ isOpen, onClose, artwork }) {
                                     Turn "{artwork.title}" into a keepsake
                                 </p>
                             </div>
+                            <div style={{
+                                marginLeft: 'auto',
+                                padding: '4px 8px',
+                                background: '#FEF3C7',
+                                color: '#D97706',
+                                borderRadius: '4px',
+                                fontSize: '0.75rem',
+                                fontWeight: '700',
+                                border: '1px solid #FCD34D'
+                            }}>
+                                DEMO MODE
+                            </div>
                         </div>
                         <Button variant="ghost" icon={X} onClick={onClose} aria-label="Close" />
                     </div>
