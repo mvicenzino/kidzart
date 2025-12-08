@@ -16,7 +16,7 @@ To make the "Print Shop" fully functional and profitable, you need to integrate 
 3.  Download their "Mockup Templates" to use in your app UI (replacing the generic icons used currently).
 
 ### Phase 2: Backend API Integration
-Since `KidzArt` is a client-side app (Rect/Vite), you should NOT expose your Printful API Keys directly in the frontend code. You need a small backend function (e.g., Vercel Serverless Function or Supabase Edge Function).
+Since `KidzArt` is a client-side app (React/Vite), you should NOT expose your Printful API Keys directly in the frontend code. You need a small backend function (e.g., Vercel Serverless Function or Supabase Edge Function).
 
 **The Workflow:**
 1.  **Frontend:** User clicks "Buy Mug".
