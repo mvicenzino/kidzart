@@ -4,12 +4,14 @@ import FocusTrap from 'focus-trap-react';
 import { X, Heart, Share2, Download, Gift, TrendingUp } from 'lucide-react';
 import { Button, Badge, Avatar } from './ui';
 import DonationModal from './DonationModal';
+import PrintShopModal from './PrintShopModal';
 import styles from './ArtModal.module.css';
 
 export default function ArtModal({ artwork, isOpen, onClose }) {
     const [isLiked, setIsLiked] = useState(false);
     const [showShareToast, setShowShareToast] = useState(false);
     const [isDonationModalOpen, setIsDonationModalOpen] = useState(false);
+    const [isPrintShopModalOpen, setIsPrintShopModalOpen] = useState(false);
     const previousActiveElement = useRef(null);
 
     // Save focus and lock body scroll when modal opens
@@ -213,7 +215,7 @@ export default function ArtModal({ artwork, isOpen, onClose }) {
                                 <button
                                     className={`${styles.actionButton} ${styles.donate}`}
                                     aria-label="Order prints and merchandise"
-                                    onClick={() => alert("KidzArt Print Shop coming soon! Pre-order custom mugs and t-shirts.")}
+                                    onClick={() => setIsPrintShopModalOpen(true)}
                                 >
                                     <Gift size={18} aria-hidden="true" />
                                     <span className={styles.actionLabel}>Print Shop</span>
@@ -299,11 +301,17 @@ export default function ArtModal({ artwork, isOpen, onClose }) {
                                 </div>
                             </div>
 
-                            {/* Donation Modal - Rendered Portal-like */}
+                            {/* Modals */}
                             <DonationModal
                                 isOpen={isDonationModalOpen}
                                 onClose={() => setIsDonationModalOpen(false)}
                                 artistName={artwork.artist}
+                            />
+
+                            <PrintShopModal
+                                isOpen={isPrintShopModalOpen}
+                                onClose={() => setIsPrintShopModalOpen(false)}
+                                artwork={artwork}
                             />
 
                             {/* Share Toast */}
