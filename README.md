@@ -1,16 +1,3 @@
-# Kidzart - Kid's Art Gallery Platform
-
-A modern React app for parents to showcase their children's artwork and share creativity with family and friends.
-
-## Features
-
-- 🎨 **Art Gallery** - Browse artwork by age group, medium, and theme
-- ✨ **Highlights Section** - Featured artwork from young artists
-- 💝 **Donations** - Support children's education with small donations
-- 🖨️ **Print Orders** - Order physical prints of artwork
-- 📥 **4K Downloads** - Download high-resolution digital prints
-- 🔐 **Authentication** - Secure sign-in with Clerk
-- 💾 **Database** - PostgreSQL with Supabase
 
 ## Quick Start
 
