@@ -4,6 +4,12 @@ You have successfully upgraded the KidzArt Print Shop to detailed checkout mode!
 
 ## 1. Get Your API Keys
 
+### [ ] Supabase CLI Login
+Before running any secret commands, you must be logged in:
+1.  Run `npx supabase login` in your terminal.
+2.  It will open your browser. Click "Confirm".
+3.  Then you can run the secret setting commands.
+
 ### [ ] Stripe (Payment Processor)
 **Option A: Reuse your Kindora AI Setup (Quickest)**
 1.  Log in to your existing Stripe Dashboard (or check your Kindora Environment Variables).
