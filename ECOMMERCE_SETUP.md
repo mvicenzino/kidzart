@@ -5,10 +5,12 @@ You have successfully upgraded the KidzArt Print Shop to detailed checkout mode!
 ## 1. Get Your API Keys
 
 ### [ ] Stripe (Payment Processor)
-1.  Go to [dashboard.stripe.com](https://dashboard.stripe.com/register).
-2.  Sign up for an account.
-3.  Get your **Publishable Key** (starts with `pk_test_...`) → Use this in Frontend.
-4.  Get your **Secret Key** (starts with `sk_test_...`) → Use this in Backend (Supabase Secrets).
+**Option A: Reuse your Kindora AI Setup (Quickest)**
+1.  Log in to your existing Stripe Dashboard.
+2.  (Recommended) Click the top-left dropdown and select **"New Account"** to create a sub-account for "KidzArt". This keeps your finances separate.
+3.  If you want to mix them, just use your existing keys.
+4.  Go to **Developers > API Keys**.
+5.  Copy the **Publishable Key** (`pk_live_...` or `pk_test_...`) and **Secret Key** (`sk_live_...` or `sk_test_...`).
 
 ### [ ] Printful (Print Provider)
 1.  Go to [developers.printful.com](https://developers.printful.com/).

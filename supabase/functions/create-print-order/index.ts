@@ -1,32 +1,47 @@
-// Follow this setup guide to deploy: https://supabase.com/docs/guides/functions
-// 1. supabase functions deploy create-print-order
-// 2. Set secrets: supabase secrets set PRINTFUL_API_KEY=your_key
+// Output: JSON with { success: true, orderId: "123" } or { success: false, error: "..." }
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
+import Stripe from 'https://esm.sh/stripe@12.0.0'
 
 const PRINTFUL_API_URL = 'https://api.printful.com';
 
 serve(async (req) => {
     try {
-        // 1. Get the request data (Artwork info, Shipping Address, Payment Token)
         const { artworkUrl, recipient, productId, stripeToken } = await req.json();
 
-        // ---------------------------------------------------------
-        // STEP 1: VALIDATE PAYMENT (Stripe)
-        // ---------------------------------------------------------
-        // In a real app, you would verify the Stripe payment intent here before proceeding.
-        // const payment = await stripe.paymentIntents.confirm(stripeToken)...
-        // if (!payment.success) throw new Error("Payment Failed");
+        // Initialize Stripe
+        const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
+            apiVersion: '2022-11-15',
+            httpClient: Stripe.createFetchHttpClient(),
+        });
 
+        if (!stripeToken) {
+            throw new Error("Missing payment information");
+        }
+
+        // ---------------------------------------------------------
+        // STEP 1: CHARGE THE CARD (Stripe)
+        // ---------------------------------------------------------
+        // We create a charge of $30.00 (or whatever your markup price is)
+        // In a production app, pass the exact amount from the frontend or calculate it here.
+        const charge = await stripe.charges.create({
+            amount: 3999, // $39.99 (hardcoded for demo simplicity, change per product logic)
+            currency: 'usd',
+            source: stripeToken, // The token ID from the frontend (e.g., 'tok_visa')
+            description: `KidzArt Order - ${productId}`,
+        });
+
+        if (!charge.paid) {
+            throw new Error("Payment declined");
+        }
 
         // ---------------------------------------------------------
         // STEP 2: CREATE ORDER IN PRINTFUL
         // ---------------------------------------------------------
-        // See docs: https://developers.printful.com/docs/#operation/createOrder
         const orderData = {
             recipient: {
                 name: recipient.name,
-                address1: recipient.address1,
+                address1: recipient.address1, // ... (rest of simple mapping)
                 city: recipient.city,
                 state_code: recipient.state,
                 country_code: recipient.country,
@@ -34,13 +49,9 @@ serve(async (req) => {
             },
             items: [
                 {
-                    variant_id: productId, // e.g., 1324 for a specific Mug variant
+                    variant_id: productId,
                     quantity: 1,
-                    files: [
-                        {
-                            url: artworkUrl // The URL of the kid's art
-                        }
-                    ]
+                    files: [{ url: artworkUrl }]
                 }
             ]
         };
@@ -60,11 +71,8 @@ serve(async (req) => {
             throw new Error(`Printful Error: ${JSON.stringify(data)}`);
         }
 
-        // ---------------------------------------------------------
-        // STEP 3: RETURN SUCCESS
-        // ---------------------------------------------------------
         return new Response(
-            JSON.stringify({ success: true, orderId: data.result.id }),
+            JSON.stringify({ success: true, orderId: data.result.id, chargeId: charge.id }),
             { headers: { "Content-Type": "application/json" } }
         );
 
@@ -74,4 +82,4 @@ serve(async (req) => {
             { status: 400, headers: { "Content-Type": "application/json" } }
         );
     }
-})
+});
