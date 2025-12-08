@@ -6,11 +6,14 @@ You have successfully upgraded the KidzArt Print Shop to detailed checkout mode!
 
 ### [ ] Stripe (Payment Processor)
 **Option A: Reuse your Kindora AI Setup (Quickest)**
-1.  Log in to your existing Stripe Dashboard.
-2.  (Recommended) Click the top-left dropdown and select **"New Account"** to create a sub-account for "KidzArt". This keeps your finances separate.
-3.  If you want to mix them, just use your existing keys.
-4.  Go to **Developers > API Keys**.
-5.  Copy the **Publishable Key** (`pk_live_...` or `pk_test_...`) and **Secret Key** (`sk_live_...` or `sk_test_...`).
+1.  Log in to your existing Stripe Dashboard (or check your Kindora Environment Variables).
+2.  Look for the **Secret Key**. It always starts with `sk_`.
+    *   Example: `sk_test_...` (It is a long string of random characters)
+3.  **Authentication:** You will use this key to set the `STRIPE_SECRET_KEY` secret in Supabase.
+
+| Kindora Variable Name | Stripe Key Format | KidzArt Command to Run |
+| :--- | :--- | :--- |
+| `STRIPE_SECRET_KEY` | `sk_live_...` | `npx supabase secrets set STRIPE_SECRET_KEY=sk_live_...` |
 
 ### [ ] Printful (Print Provider)
 1.  Go to [developers.printful.com](https://developers.printful.com/).
