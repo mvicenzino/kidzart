@@ -1,12 +1,23 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import PropTypes from 'prop-types';
 import { X, ShoppingBag, Check } from 'lucide-react';
 import { Button } from './ui';
 import styles from './ui/Modal.module.css';
 
 export default function PrintShopModal({ isOpen, onClose, artwork }) {
-    const [step, setStep] = useState('select'); // select, customize, success
+    const [step, setStep] = useState('select'); // select, customize, checkout, success
     const [selectedProduct, setSelectedProduct] = useState(null);
+
+    // Prevent scrolling when modal is open
+    useEffect(() => {
+        if (isOpen) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = '';
+        }
+        return () => { document.body.style.overflow = ''; }
+    }, [isOpen]);
 
     if (!isOpen || !artwork) return null;
 
@@ -48,7 +59,6 @@ export default function PrintShopModal({ isOpen, onClose, artwork }) {
 
         try {
             // 1. Call our Supabase Edge Function
-            // Note: In local dev, this points to localhost. In prod, it points to your Supabase project.
             const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/create-print-order`, {
                 method: 'POST',
                 headers: {
@@ -56,11 +66,9 @@ export default function PrintShopModal({ isOpen, onClose, artwork }) {
                     'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`
                 },
                 body: JSON.stringify({
-                    artworkUrl: artwork.imageUrl, // Ensure this is a public URL!
+                    artworkUrl: artwork.imageUrl,
                     recipient: shipping,
                     productId: selectedProduct.id,
-                    // In a real app, you'd pass a Stripe token here.
-                    // For now, we simulate the payment token.
                     stripeToken: 'tok_visa'
                 })
             });
@@ -68,15 +76,15 @@ export default function PrintShopModal({ isOpen, onClose, artwork }) {
             const data = await response.json();
 
             if (!response.ok) {
+                // If the function returns an error (e.g. 500), throw it
                 throw new Error(data.error || 'Failed to place order');
             }
 
             setStep('success');
         } catch (err) {
             console.error(err);
-            // If we are in "Demo Mode" without a backend, we can fallback to success for UX testing
             if (err.message.includes('Failed to fetch') || err.message.includes('404')) {
-                // Fallback simulation for demo
+                // Fallback simulation for demo if backend isn't reachable
                 setTimeout(() => setStep('success'), 1500);
             } else {
                 setError(err.message);
@@ -86,122 +94,15 @@ export default function PrintShopModal({ isOpen, onClose, artwork }) {
         }
     };
 
-    // ... (render) ...
-
-    {
-        step === 'customize' && selectedProduct && (
-            // ... existing customize UI ...
-            <Button variant="secondary" onClick={handleGoToCheckout} size="lg" style={{ width: '100%' }}>
-                Proceed to Checkout
-            </Button>
-            // ...
-        )
-    }
-
-    {
-        step === 'checkout' && (
-            <div className="animate-fade-in">
-                <h3 style={{ fontSize: '1.25rem', fontWeight: '700', marginBottom: 'var(--space-4)' }}>
-                    Shipping Details
-                </h3>
-                <form onSubmit={handleSubmitOrder} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
-
-                    <input
-                        required
-                        placeholder="Full Name"
-                        className={styles.input}
-                        value={shipping.name}
-                        onChange={e => setShipping({ ...shipping, name: e.target.value })}
-                    />
-                    <input
-                        required
-                        placeholder="Address Line 1"
-                        className={styles.input}
-                        value={shipping.address1}
-                        onChange={e => setShipping({ ...shipping, address1: e.target.value })}
-                    />
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-3)' }}>
-                        <input
-                            required
-                            placeholder="City"
-                            className={styles.input}
-                            value={shipping.city}
-                            onChange={e => setShipping({ ...shipping, city: e.target.value })}
-                        />
-                        <input
-                            required
-                            placeholder="Zip Code"
-                            className={styles.input}
-                            value={shipping.zip}
-                            onChange={e => setShipping({ ...shipping, zip: e.target.value })}
-                        />
-                    </div>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-3)' }}>
-                        <input
-                            required
-                            placeholder="State (e.g. CA)"
-                            className={styles.input}
-                            value={shipping.state}
-                            onChange={e => setShipping({ ...shipping, state: e.target.value })}
-                        />
-                        <select
-                            className={styles.input}
-                            value={shipping.country}
-                            onChange={e => setShipping({ ...shipping, country: e.target.value })}
-                        >
-                            <option value="US">United States</option>
-                            <option value="CA">Canada</option>
-                            <option value="GB">United Kingdom</option>
-                        </select>
-                    </div>
-
-                    {error && (
-                        <div style={{ color: 'red', fontSize: '0.875rem', padding: 'var(--space-2)', background: '#FEF2F2', borderRadius: 'var(--radius-md)' }}>
-                            {error}
-                        </div>
-                    )}
-
-                    <div style={{
-                        marginTop: 'var(--space-4)',
-                        padding: 'var(--space-4)',
-                        backgroundColor: 'var(--surface-alt)',
-                        borderRadius: 'var(--radius-lg)'
-                    }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: '600', marginBottom: 'var(--space-4)' }}>
-                            <span>Total to Pay</span>
-                            <span>${selectedProduct.price}</span>
-                        </div>
-
-                        <Button
-                            variant="primary"
-                            type="submit"
-                            size="lg"
-                            loading={isProcessing}
-                            style={{ width: '100%' }}
-                        >
-                            Pay & Place Order
-                        </Button>
-                    </div>
-
-                    <button
-                        type="button"
-                        onClick={() => setStep('customize')}
-                        style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', alignSelf: 'center' }}
-                    >
-                        Back
-                    </button>
-                </form>
-            </div>
-        )
-    }
-
-    return (
+    // Use React Portal to render at the root of the document body
+    // This bypasses any z-index or overflow clipping from the parent component tree
+    return createPortal(
         <div
             className={styles.backdrop}
             onClick={handleBackdropClick}
             role="dialog"
             aria-modal="true"
-            style={{ zIndex: 1100 }}
+            style={{ zIndex: 9999 }}
         >
             <div
                 className={styles.modal}
@@ -372,6 +273,101 @@ export default function PrintShopModal({ isOpen, onClose, artwork }) {
                         </div>
                     )}
 
+                    {step === 'checkout' && (
+                        <div className="animate-fade-in">
+                            <h3 style={{ fontSize: '1.25rem', fontWeight: '700', marginBottom: 'var(--space-4)' }}>
+                                Shipping Details
+                            </h3>
+                            <form onSubmit={handleSubmitOrder} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
+
+                                <input
+                                    required
+                                    placeholder="Full Name"
+                                    className={styles.input}
+                                    value={shipping.name}
+                                    onChange={e => setShipping({ ...shipping, name: e.target.value })}
+                                />
+                                <input
+                                    required
+                                    placeholder="Address Line 1"
+                                    className={styles.input}
+                                    value={shipping.address1}
+                                    onChange={e => setShipping({ ...shipping, address1: e.target.value })}
+                                />
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-3)' }}>
+                                    <input
+                                        required
+                                        placeholder="City"
+                                        className={styles.input}
+                                        value={shipping.city}
+                                        onChange={e => setShipping({ ...shipping, city: e.target.value })}
+                                    />
+                                    <input
+                                        required
+                                        placeholder="Zip Code"
+                                        className={styles.input}
+                                        value={shipping.zip}
+                                        onChange={e => setShipping({ ...shipping, zip: e.target.value })}
+                                    />
+                                </div>
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-3)' }}>
+                                    <input
+                                        required
+                                        placeholder="State (e.g. CA)"
+                                        className={styles.input}
+                                        value={shipping.state}
+                                        onChange={e => setShipping({ ...shipping, state: e.target.value })}
+                                    />
+                                    <select
+                                        className={styles.input}
+                                        value={shipping.country}
+                                        onChange={e => setShipping({ ...shipping, country: e.target.value })}
+                                    >
+                                        <option value="US">United States</option>
+                                        <option value="CA">Canada</option>
+                                        <option value="GB">United Kingdom</option>
+                                    </select>
+                                </div>
+
+                                {error && (
+                                    <div style={{ color: 'red', fontSize: '0.875rem', padding: 'var(--space-2)', background: '#FEF2F2', borderRadius: 'var(--radius-md)' }}>
+                                        {error}
+                                    </div>
+                                )}
+
+                                <div style={{
+                                    marginTop: 'var(--space-4)',
+                                    padding: 'var(--space-4)',
+                                    backgroundColor: 'var(--surface-alt)',
+                                    borderRadius: 'var(--radius-lg)'
+                                }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: '600', marginBottom: 'var(--space-4)' }}>
+                                        <span>Total to Pay</span>
+                                        <span>${selectedProduct.price}</span>
+                                    </div>
+
+                                    <Button
+                                        variant="primary"
+                                        type="submit"
+                                        size="lg"
+                                        loading={isProcessing}
+                                        style={{ width: '100%' }}
+                                    >
+                                        Pay & Place Order
+                                    </Button>
+                                </div>
+
+                                <button
+                                    type="button"
+                                    onClick={() => setStep('customize')}
+                                    style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', alignSelf: 'center' }}
+                                >
+                                    Back
+                                </button>
+                            </form>
+                        </div>
+                    )}
+
                     {step === 'success' && (
                         <div className="animate-fade-in" style={{ textAlign: 'center', padding: 'var(--space-8) 0' }}>
                             <div style={{
@@ -392,7 +388,8 @@ export default function PrintShopModal({ isOpen, onClose, artwork }) {
                     )}
                 </div>
             </div>
-        </div>
+        </div>,
+        document.body
     );
 }
 
