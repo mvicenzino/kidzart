@@ -106,7 +106,17 @@ export default function PrintShopModal({ isOpen, onClose, artwork }) {
         >
             <div
                 className={styles.modal}
-                style={{ maxWidth: '600px', height: 'auto', maxHeight: '90vh' }}
+                style={{
+                    maxWidth: '600px',
+                    width: '90%',
+                    height: 'auto',
+                    maxHeight: '90vh',
+                    backgroundColor: '#ffffff', // Force white background
+                    opacity: 1, // Force opacity
+                    transform: 'none', // Disable transform animation issues
+                    animation: 'none', // Disable CSS animation to rule out race conditions
+                    zIndex: 10001 // Ensure it sits above backdrop
+                }}
                 onClick={e => e.stopPropagation()}
             >
                 {/* Header */}
