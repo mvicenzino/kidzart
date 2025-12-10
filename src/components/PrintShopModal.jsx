@@ -6,8 +6,41 @@ import { Button } from './ui';
 import styles from './ui/Modal.module.css';
 
 export default function PrintShopModal({ isOpen, onClose, artwork }) {
-    const [step, setStep] = useState('select'); // select, customize, checkout, success
+    const [step, setStep] = useState('select');
     const [selectedProduct, setSelectedProduct] = useState(null);
+
+    // Environment Validation - purely text based, no client init here
+    const [configStatus, setConfigStatus] = useState({
+        hasUrl: false,
+        hasKey: false,
+        checked: false
+    });
+
+    useEffect(() => {
+        try {
+            const url = import.meta.env.VITE_SUPABASE_URL;
+            const key = import.meta.env.VITE_SUPABASE_ANON_KEY;
+            setConfigStatus({
+                hasUrl: !!url,
+                hasKey: !!key,
+                checked: true
+            });
+        } catch (e) {
+            console.error("Env check failed:", e);
+        }
+    }, []);
+
+    const isConfigured = configStatus.hasUrl && configStatus.hasKey;
+
+    // Debug logging
+    useEffect(() => {
+        if (isOpen) {
+            console.log('Print Shop Modal Opened');
+            console.log('Config:', configStatus);
+            if (artwork) console.log('Artwork loaded:', artwork.title);
+            else console.error('Artwork missing!');
+        }
+    }, [isOpen, configStatus, artwork]);
 
     // Prevent scrolling when modal is open
     useEffect(() => {
@@ -57,13 +90,21 @@ export default function PrintShopModal({ isOpen, onClose, artwork }) {
         setIsProcessing(true);
         setError(null);
 
+        if (!isConfigured) {
+            setError("Configuration Error: Missing API Keys. Please check Vercel settings.");
+            setIsProcessing(false);
+            return;
+        }
+
         try {
-            // 1. Call our Supabase Edge Function
-            const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/create-print-order`, {
+            const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+            const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+
+            const response = await fetch(`${supabaseUrl}/functions/v1/create-print-order`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`
+                    'Authorization': `Bearer ${supabaseKey}`
                 },
                 body: JSON.stringify({
                     artworkUrl: artwork.imageUrl,
@@ -73,60 +114,83 @@ export default function PrintShopModal({ isOpen, onClose, artwork }) {
                 })
             });
 
-            const data = await response.json();
+            const text = await response.text();
+            let data;
+            try {
+                data = JSON.parse(text);
+            } catch (jsonError) {
+                // Determine if 404
+                if (response.status === 404) {
+                    throw new Error("Backend function not found. Did you deploy 'create-print-order'?");
+                }
+                throw new Error(`Server Error (${response.status}): ${text.substring(0, 100)}...`);
+            }
 
             if (!response.ok) {
-                // If the function returns an error (e.g. 500), throw it
-                throw new Error(data.error || 'Failed to place order');
+                throw new Error(data.error || `Order Failed (${response.status})`);
             }
 
             setStep('success');
         } catch (err) {
-            console.error(err);
-            if (err.message.includes('Failed to fetch') || err.message.includes('404')) {
-                // Fallback simulation for demo if backend isn't reachable
-                setTimeout(() => setStep('success'), 1500);
-            } else {
-                setError(err.message);
-            }
+            console.error("Print Shop Error:", err);
+            setError(err.message);
         } finally {
             setIsProcessing(false);
         }
     };
 
-    // Use React Portal to render at the root of the document body
-    // This bypasses any z-index or overflow clipping from the parent component tree
+    // Use inline styles for the critical outer layers to prevent CSS module issues from hiding the modal
+    const backdropStyle = {
+        position: 'fixed',
+        inset: 0,
+        backgroundColor: 'rgba(0, 0, 0, 0.75)',
+        backdropFilter: 'blur(8px)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        zIndex: 9999,
+        padding: '1rem'
+    };
+
+    const modalStyle = {
+        backgroundColor: '#ffffff',
+        borderRadius: '1.5rem',
+        width: '100%',
+        maxWidth: '600px',
+        maxHeight: '90vh',
+        overflow: 'hidden',
+        boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.4)',
+        display: 'flex',
+        flexDirection: 'column',
+        position: 'relative',
+        zIndex: 10001
+    };
+
     return createPortal(
         <div
-            className={styles.backdrop}
+            style={backdropStyle}
             onClick={handleBackdropClick}
             role="dialog"
             aria-modal="true"
-            style={{ zIndex: 9999 }}
         >
             <div
-                className={styles.modal}
-                style={{
-                    maxWidth: '600px',
-                    width: '90%',
-                    height: 'auto',
-                    maxHeight: '90vh',
-                    backgroundColor: '#ffffff', // Force white background
-                    opacity: 1, // Force opacity
-                    transform: 'none', // Disable transform animation issues
-                    animation: 'none', // Disable CSS animation to rule out race conditions
-                    zIndex: 10001 // Ensure it sits above backdrop
-                }}
+                style={modalStyle}
                 onClick={e => e.stopPropagation()}
             >
                 {/* Header */}
-                <div className={styles.header}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
+                <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    padding: '1.25rem 1.5rem',
+                    borderBottom: '1px solid #e2e8f0'
+                }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                         <div style={{
                             width: '40px',
                             height: '40px',
-                            borderRadius: 'var(--radius-full)',
-                            background: 'var(--secondary)',
+                            borderRadius: '9999px',
+                            background: '#ec4899', // Pink-500
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
@@ -135,70 +199,112 @@ export default function PrintShopModal({ isOpen, onClose, artwork }) {
                             <ShoppingBag size={20} />
                         </div>
                         <div>
-                            <h2 style={{ fontSize: '1.25rem', fontWeight: '700', marginBottom: '2px' }}>
+                            <h2 style={{ fontSize: '1.25rem', fontWeight: '700', marginBottom: '2px', lineHeight: 1.2 }}>
                                 KidzArt Print Shop
                             </h2>
-                            <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)' }}>
+                            <p style={{ fontSize: '0.875rem', color: '#64748b', margin: 0 }}>
                                 Turn "{artwork.title}" into a keepsake
                             </p>
                         </div>
+                    </div>
+
+                    {isConfigured ? (
                         <div style={{
                             marginLeft: 'auto',
+                            marginRight: '1rem',
                             padding: '4px 8px',
-                            background: '#FEF3C7',
-                            color: '#D97706',
+                            background: '#E0F2FE',
+                            color: '#0369A1',
                             borderRadius: '4px',
                             fontSize: '0.75rem',
                             fontWeight: '700',
-                            border: '1px solid #FCD34D'
+                            border: '1px solid #BAE6FD',
+                            whiteSpace: 'nowrap'
                         }}>
-                            DEMO MODE
+                            BETA
                         </div>
-                    </div>
+                    ) : (
+                        <div style={{
+                            marginLeft: 'auto',
+                            marginRight: '1rem',
+                            padding: '4px 8px',
+                            background: '#FEE2E2',
+                            color: '#DC2626',
+                            borderRadius: '4px',
+                            fontSize: '0.75rem',
+                            fontWeight: '700',
+                            border: '1px solid #FECACA',
+                            whiteSpace: 'nowrap'
+                        }}>
+                            SETUP NEEDED
+                        </div>
+                    )}
+
                     <Button variant="ghost" icon={X} onClick={onClose} aria-label="Close" />
                 </div>
 
                 {/* Content */}
-                <div style={{ padding: 'var(--space-6)', overflowY: 'auto' }}>
+                <div style={{ padding: '1.5rem', overflowY: 'auto' }}>
+
+                    {!isConfigured && step !== 'success' && (
+                        <div style={{
+                            padding: '1rem',
+                            backgroundColor: '#FEF2F2',
+                            border: '1px solid #FCA5A5',
+                            borderRadius: '0.5rem',
+                            marginBottom: '1.5rem',
+                            color: '#7F1D1D',
+                            fontSize: '0.875rem'
+                        }}>
+                            <strong>Backend Configuration Missing:</strong> <br />
+                            This feature requires keys in your Vercel Environment Variables:
+                            <ul style={{ margin: '0.5rem 0 0 1rem', paddingLeft: '1rem' }}>
+                                <li><code>VITE_SUPABASE_URL</code></li>
+                                <li><code>VITE_SUPABASE_ANON_KEY</code></li>
+                            </ul>
+                        </div>
+                    )}
+
                     {step === 'select' && (
                         <div className="animate-fade-in">
                             <div style={{
                                 display: 'grid',
                                 gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-                                gap: 'var(--space-4)'
+                                gap: '1rem'
                             }}>
                                 {products.map((p) => (
                                     <button
                                         key={p.id}
                                         onClick={() => handleProductSelect(p)}
                                         style={{
-                                            padding: 'var(--space-4)',
-                                            border: '1px solid var(--border)',
-                                            borderRadius: 'var(--radius-xl)',
-                                            backgroundColor: 'var(--surface)',
+                                            padding: '1rem',
+                                            border: '1px solid #e2e8f0',
+                                            borderRadius: '1rem',
+                                            backgroundColor: '#ffffff',
                                             cursor: 'pointer',
                                             textAlign: 'center',
-                                            transition: 'all var(--transition-fast)',
+                                            transition: 'transform 0.2s',
                                             display: 'flex',
                                             flexDirection: 'column',
                                             alignItems: 'center',
-                                            gap: 'var(--space-2)'
+                                            gap: '0.5rem',
+                                            width: '100%'
                                         }}
                                         onMouseEnter={e => {
-                                            e.currentTarget.style.borderColor = 'var(--secondary)';
+                                            e.currentTarget.style.borderColor = '#ec4899';
                                             e.currentTarget.style.transform = 'translateY(-2px)';
-                                            e.currentTarget.style.boxShadow = 'var(--shadow-md)';
+                                            e.currentTarget.style.boxShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.1)';
                                         }}
                                         onMouseLeave={e => {
-                                            e.currentTarget.style.borderColor = 'var(--border)';
+                                            e.currentTarget.style.borderColor = '#e2e8f0';
                                             e.currentTarget.style.transform = 'none';
                                             e.currentTarget.style.boxShadow = 'none';
                                         }}
                                     >
-                                        <div style={{ fontSize: '2.5rem', marginBottom: 'var(--space-2)' }}>{p.icon}</div>
-                                        <div style={{ fontWeight: '700', color: 'var(--text-main)' }}>{p.name}</div>
-                                        <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: 'var(--space-2)' }}>{p.desc}</div>
-                                        <div style={{ fontWeight: '600', color: 'var(--secondary)' }}>${p.price}</div>
+                                        <div style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>{p.icon}</div>
+                                        <div style={{ fontWeight: '700', color: '#1e293b' }}>{p.name}</div>
+                                        <div style={{ fontSize: '0.8rem', color: '#64748b', marginBottom: '0.5rem' }}>{p.desc}</div>
+                                        <div style={{ fontWeight: '600', color: '#ec4899' }}>${p.price}</div>
                                     </button>
                                 ))}
                             </div>
@@ -209,8 +315,8 @@ export default function PrintShopModal({ isOpen, onClose, artwork }) {
                         <div className="animate-fade-in">
                             <div style={{
                                 display: 'flex',
-                                gap: 'var(--space-6)',
-                                marginBottom: 'var(--space-6)',
+                                gap: '1.5rem',
+                                marginBottom: '1.5rem',
                                 alignItems: 'center',
                                 flexWrap: 'wrap'
                             }}>
@@ -219,13 +325,13 @@ export default function PrintShopModal({ isOpen, onClose, artwork }) {
                                     flex: '1 1 200px',
                                     aspectRatio: '1',
                                     backgroundColor: '#f1f5f9',
-                                    borderRadius: 'var(--radius-xl)',
+                                    borderRadius: '1rem',
                                     display: 'flex',
                                     alignItems: 'center',
                                     justifyContent: 'center',
                                     position: 'relative',
                                     overflow: 'hidden',
-                                    border: '1px solid var(--border)'
+                                    border: '1px solid #e2e8f0'
                                 }}>
                                     <div style={{ fontSize: '8rem', opacity: 0.1 }}>{selectedProduct.icon}</div>
                                     <img
@@ -235,7 +341,7 @@ export default function PrintShopModal({ isOpen, onClose, artwork }) {
                                             position: 'absolute',
                                             width: '50%',
                                             height: 'auto',
-                                            boxShadow: 'var(--shadow-lg)',
+                                            boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
                                             transform: 'rotate(-5deg)',
                                             border: '2px solid white'
                                         }}
@@ -243,16 +349,16 @@ export default function PrintShopModal({ isOpen, onClose, artwork }) {
                                 </div>
 
                                 <div style={{ flex: '1 1 200px' }}>
-                                    <h3 style={{ fontSize: '1.25rem', fontWeight: '700', marginBottom: 'var(--space-2)' }}>{selectedProduct.name}</h3>
-                                    <p style={{ color: 'var(--text-secondary)', marginBottom: 'var(--space-4)' }}>{selectedProduct.desc}</p>
+                                    <h3 style={{ fontSize: '1.25rem', fontWeight: '700', marginBottom: '0.5rem' }}>{selectedProduct.name}</h3>
+                                    <p style={{ color: '#64748b', marginBottom: '1rem' }}>{selectedProduct.desc}</p>
 
                                     <div style={{
-                                        padding: 'var(--space-3)',
-                                        backgroundColor: 'var(--surface-alt)',
-                                        borderRadius: 'var(--radius-lg)',
-                                        marginBottom: 'var(--space-6)'
+                                        padding: '0.75rem',
+                                        backgroundColor: '#f8fafc',
+                                        borderRadius: '0.5rem',
+                                        marginBottom: '1.5rem'
                                     }}>
-                                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 'var(--space-2)' }}>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
                                             <span>Subtotal</span>
                                             <span>${selectedProduct.price}</span>
                                         </div>
@@ -268,11 +374,11 @@ export default function PrintShopModal({ isOpen, onClose, artwork }) {
                                     <button
                                         onClick={() => setStep('select')}
                                         style={{
-                                            marginTop: 'var(--space-3)',
+                                            marginTop: '0.75rem',
                                             width: '100%',
                                             background: 'none',
                                             border: 'none',
-                                            color: 'var(--text-muted)',
+                                            color: '#64748b',
                                             cursor: 'pointer'
                                         }}
                                     >
@@ -285,15 +391,16 @@ export default function PrintShopModal({ isOpen, onClose, artwork }) {
 
                     {step === 'checkout' && (
                         <div className="animate-fade-in">
-                            <h3 style={{ fontSize: '1.25rem', fontWeight: '700', marginBottom: 'var(--space-4)' }}>
+                            <h3 style={{ fontSize: '1.25rem', fontWeight: '700', marginBottom: '1rem' }}>
                                 Shipping Details
                             </h3>
-                            <form onSubmit={handleSubmitOrder} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
+                            <form onSubmit={handleSubmitOrder} style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
 
                                 <input
                                     required
                                     placeholder="Full Name"
                                     className={styles.input}
+                                    style={{ width: '100%', padding: '0.75rem', border: '1px solid #e2e8f0', borderRadius: '0.375rem' }}
                                     value={shipping.name}
                                     onChange={e => setShipping({ ...shipping, name: e.target.value })}
                                 />
@@ -301,14 +408,16 @@ export default function PrintShopModal({ isOpen, onClose, artwork }) {
                                     required
                                     placeholder="Address Line 1"
                                     className={styles.input}
+                                    style={{ width: '100%', padding: '0.75rem', border: '1px solid #e2e8f0', borderRadius: '0.375rem' }}
                                     value={shipping.address1}
                                     onChange={e => setShipping({ ...shipping, address1: e.target.value })}
                                 />
-                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-3)' }}>
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
                                     <input
                                         required
                                         placeholder="City"
                                         className={styles.input}
+                                        style={{ width: '100%', padding: '0.75rem', border: '1px solid #e2e8f0', borderRadius: '0.375rem' }}
                                         value={shipping.city}
                                         onChange={e => setShipping({ ...shipping, city: e.target.value })}
                                     />
@@ -316,20 +425,23 @@ export default function PrintShopModal({ isOpen, onClose, artwork }) {
                                         required
                                         placeholder="Zip Code"
                                         className={styles.input}
+                                        style={{ width: '100%', padding: '0.75rem', border: '1px solid #e2e8f0', borderRadius: '0.375rem' }}
                                         value={shipping.zip}
                                         onChange={e => setShipping({ ...shipping, zip: e.target.value })}
                                     />
                                 </div>
-                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-3)' }}>
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
                                     <input
                                         required
                                         placeholder="State (e.g. CA)"
                                         className={styles.input}
+                                        style={{ width: '100%', padding: '0.75rem', border: '1px solid #e2e8f0', borderRadius: '0.375rem' }}
                                         value={shipping.state}
                                         onChange={e => setShipping({ ...shipping, state: e.target.value })}
                                     />
                                     <select
                                         className={styles.input}
+                                        style={{ width: '100%', padding: '0.75rem', border: '1px solid #e2e8f0', borderRadius: '0.375rem' }}
                                         value={shipping.country}
                                         onChange={e => setShipping({ ...shipping, country: e.target.value })}
                                     >
@@ -340,18 +452,18 @@ export default function PrintShopModal({ isOpen, onClose, artwork }) {
                                 </div>
 
                                 {error && (
-                                    <div style={{ color: 'red', fontSize: '0.875rem', padding: 'var(--space-2)', background: '#FEF2F2', borderRadius: 'var(--radius-md)' }}>
-                                        {error}
+                                    <div style={{ color: '#B91C1C', fontSize: '0.875rem', padding: '0.75rem', background: '#FEF2F2', borderRadius: '0.375rem', border: '1px solid #FCA5A5' }}>
+                                        <strong>Error:</strong> {error}
                                     </div>
                                 )}
 
                                 <div style={{
-                                    marginTop: 'var(--space-4)',
-                                    padding: 'var(--space-4)',
-                                    backgroundColor: 'var(--surface-alt)',
-                                    borderRadius: 'var(--radius-lg)'
+                                    marginTop: '1rem',
+                                    padding: '1rem',
+                                    backgroundColor: '#f8fafc',
+                                    borderRadius: '0.5rem'
                                 }}>
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: '600', marginBottom: 'var(--space-4)' }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: '600', marginBottom: '1rem' }}>
                                         <span>Total to Pay</span>
                                         <span>${selectedProduct.price}</span>
                                     </div>
@@ -362,15 +474,17 @@ export default function PrintShopModal({ isOpen, onClose, artwork }) {
                                         size="lg"
                                         loading={isProcessing}
                                         style={{ width: '100%' }}
+                                        disabled={!isConfigured}
                                     >
-                                        Pay & Place Order
+                                        {isConfigured ? 'Pay & Place Order' : 'Setup Required'}
                                     </Button>
+                                    {!isConfigured && <p style={{ fontSize: '0.75rem', color: '#94a3b8', marginTop: '0.5rem', textAlign: 'center' }}>Configure env vars to enable payment</p>}
                                 </div>
 
                                 <button
                                     type="button"
                                     onClick={() => setStep('customize')}
-                                    style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', alignSelf: 'center' }}
+                                    style={{ background: 'none', border: 'none', color: '#64748b', cursor: 'pointer', alignSelf: 'center', marginTop: '0.5rem' }}
                                 >
                                     Back
                                 </button>
@@ -379,19 +493,19 @@ export default function PrintShopModal({ isOpen, onClose, artwork }) {
                     )}
 
                     {step === 'success' && (
-                        <div className="animate-fade-in" style={{ textAlign: 'center', padding: 'var(--space-8) 0' }}>
+                        <div className="animate-fade-in" style={{ textAlign: 'center', padding: '3rem 0' }}>
                             <div style={{
                                 width: '80px', height: '80px', borderRadius: '50%', background: '#22c55e',
                                 display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white',
-                                margin: '0 auto var(--space-6)'
+                                margin: '0 auto 1.5rem'
                             }}>
                                 <Check size={40} />
                             </div>
-                            <h3 style={{ fontSize: '1.5rem', fontWeight: '700', marginBottom: 'var(--space-2)' }}>
-                                Added to Cart!
+                            <h3 style={{ fontSize: '1.5rem', fontWeight: '700', marginBottom: '0.5rem' }}>
+                                Order Placed Successfully!
                             </h3>
-                            <p style={{ color: 'var(--text-secondary)', marginBottom: 'var(--space-6)' }}>
-                                We've simulated adding this {selectedProduct.name} to your cart. In production, this would connect to a service like Printful or Gelato.
+                            <p style={{ color: '#64748b', marginBottom: '1.5rem' }}>
+                                Your {selectedProduct.name} is being processed. In a real application, you would receive a confirmation email shortly.
                             </p>
                             <Button variant="primary" onClick={onClose}>Done</Button>
                         </div>

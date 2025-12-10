@@ -30,6 +30,16 @@ const AppWithAuth = () => {
   )
 }
 
+// Global Error Handlers for debugging in Production
+window.addEventListener('error', (event) => {
+  console.error('Global Error caught:', event.error);
+});
+
+window.addEventListener('unhandledrejection', (event) => {
+  // Prevent crash from non-critical promise failures (like 3rd party scripts)
+  console.warn('Unhandled Promise Rejection:', event.reason);
+});
+
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <AppWithAuth />

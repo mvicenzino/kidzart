@@ -5,6 +5,7 @@ import ArtCard from './components/ArtCard';
 import ArtModal from './components/ArtModal';
 import FilterBar from './components/FilterBar';
 import ProfilePage from './pages/ProfilePage';
+import ErrorBoundary from './components/ErrorBoundary'; // Import ErrorBoundary
 import { useArtworks } from './hooks/useArtworks';
 import { taxonomy } from './data/mockData';
 import { Sparkles, ArrowRight, Palette, Users, Heart } from 'lucide-react';
@@ -52,7 +53,7 @@ function HomePage() {
   const hasActiveFilters = Object.values(filters).some(v => v !== 'all');
 
   return (
-    <>
+    <ErrorBoundary>
       {/* Hero Section - Clean and Focused */}
       <header style={{
         padding: 'var(--space-20) 0 var(--space-16)',
@@ -419,7 +420,7 @@ function HomePage() {
         isOpen={isModalOpen}
         onClose={handleCloseModal}
       />
-    </>
+    </ErrorBoundary>
   );
 }
 
