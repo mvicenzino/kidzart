@@ -16,6 +16,25 @@ export default function PrintShopModal({ isOpen, onClose, artwork }) {
         checked: false
     });
 
+    // MOVED UP: State initialization must happen before any returns
+    const [shipping, setShipping] = useState({
+        name: '',
+        address1: '',
+        city: '',
+        state: '',
+        zip: '',
+        country: 'US'
+    });
+    const [isProcessing, setIsProcessing] = useState(false);
+    const [error, setError] = useState(null);
+
+    const products = [
+        { id: 'canvas', name: 'Gallery Canvas', price: 49.99, icon: '🖼️', desc: 'Museum quality wrap (16x20)' },
+        { id: 'mug', name: 'Morning Mug', price: 14.99, icon: '☕', desc: '11oz ceramic mug' },
+        { id: 'shirt', name: 'Artist Tee', price: 24.99, icon: '👕', desc: 'Soft cotton youth tee' },
+        { id: 'book', name: 'Hardcover Book', price: 39.99, icon: '📚', desc: '20-page memory book' }
+    ];
+
     useEffect(() => {
         try {
             const url = import.meta.env.VITE_SUPABASE_URL;
@@ -53,24 +72,6 @@ export default function PrintShopModal({ isOpen, onClose, artwork }) {
     }, [isOpen]);
 
     if (!isOpen || !artwork) return null;
-
-    const products = [
-        { id: 'canvas', name: 'Gallery Canvas', price: 49.99, icon: '🖼️', desc: 'Museum quality wrap (16x20)' },
-        { id: 'mug', name: 'Morning Mug', price: 14.99, icon: '☕', desc: '11oz ceramic mug' },
-        { id: 'shirt', name: 'Artist Tee', price: 24.99, icon: '👕', desc: 'Soft cotton youth tee' },
-        { id: 'book', name: 'Hardcover Book', price: 39.99, icon: '📚', desc: '20-page memory book' }
-    ];
-
-    const [shipping, setShipping] = useState({
-        name: '',
-        address1: '',
-        city: '',
-        state: '',
-        zip: '',
-        country: 'US'
-    });
-    const [isProcessing, setIsProcessing] = useState(false);
-    const [error, setError] = useState(null);
 
     const handleBackdropClick = (e) => {
         if (e.target === e.currentTarget) onClose();
@@ -119,7 +120,6 @@ export default function PrintShopModal({ isOpen, onClose, artwork }) {
             try {
                 data = JSON.parse(text);
             } catch (jsonError) {
-                // Determine if 404
                 if (response.status === 404) {
                     throw new Error("Backend function not found. Did you deploy 'create-print-order'?");
                 }
