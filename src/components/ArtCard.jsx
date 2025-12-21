@@ -37,6 +37,7 @@ export default function ArtCard({ artwork, onClick }) {
                     src={artwork.imageUrl}
                     alt={artwork.title}
                     className={styles.image}
+                    loading="lazy"
                     onError={() => setImageError(true)}
                 />
 

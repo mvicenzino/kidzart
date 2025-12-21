@@ -130,4 +130,6 @@ export default function Navbar({ onUploadClick }) {
     );
 }
 
-Navbar.propTypes = {};
+Navbar.propTypes = {
+    onUploadClick: PropTypes.func
+};
